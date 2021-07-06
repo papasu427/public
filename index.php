@@ -93,9 +93,9 @@
 
 		<!-- 検索・レジ・特集タグ -->
 		<div class="header-nav border-t-1 bd-gray-4">
-			<div class="flex border-b-6 bd-b-category justify-between content-width center-margin">
+			<div class="heder-nav-cont flex border-b-6 bd-b-category justify-between content-width center-margin relative">
 				<div class="w-full flex justify-center items-center flex-wrap">
-					<div class="flex w-full" style="background-color:#ffffff; padding: 16px;">
+					<div class="flex w-full" style="background-color:#ffffff; padding: 12px 16px;">
 						<form id="form1" class="heder-serch-width mr-20px mt-4px" action="自分のサイトURL">
 							<input id="sbox" id="s" name="s" type="text" placeholder="キーワードで検索" />
 							<button id="sbtn" type="submit">
@@ -143,85 +143,50 @@
 						<li class="tag-menu-width text-size14 box-read modal-open btn-tag-categorey px-12px" data-target="modal01">特集を全て表示</li>
 					</ul>
 				</div>
-				<div class="cart-contnet cart-text-color">
-					<div class="flex justify-between items-center">
-						<div class="relative">
-							<img class="item-cart-icon-color-black" src="resouse/s_images/common/cart.png">
-							<span class="absolute notice" style="left: 34px; top: -2px;">100</span>
+				<div class="cart-box">
+					<div class="cart-contnet cart-text-color">
+						<div class="flex justify-between items-center">
+							<div class="relative">
+								<img class="item-cart-icon-color-black" src="resouse/s_images/common/cart.png">
+								<span class="absolute notice" style="left: 34px; top: -2px;">100</span>
+							</div>
+							<ul class="text-right text-size14 cart-text-color">
+								<li>小計<span class="text-size20 bold price-color">200</span>円</li>
+								<li class="text-size12">送料300円</li>
+								<li class="text-size12">あと1850円で送料無料</li>
+							</ul>
 						</div>
-						<ul class="text-right text-size14 cart-text-color">
-							<li>小計<span class="text-size20 bold price-color">200</span>円</li>
-							<li class="text-size12">送料300円</li>
-							<li class="text-size12">あと1850円で送料無料</li>
-						</ul>
+						<a href="#" class="btn-cart mt-8px">レジへ進む</a>
 					</div>
-					<a href="#" class="btn-cart mt-8px">レジへ進む</a>
+					<ul id="cart-item-list" class="cart-item-list flex flex-wrap">
+						<?php
+						for ($val = 0; $val <= 10; $val++) {
+							echo '						<li class="cart-item py-20px px-20px w-180px relative">
+							<div class="absolute cart-item-close">x</div>
+							<div><img src="resouse/s_images/common/banana.png" width="60%" class="center-margin"></div>
+							<p class="mt-6 box-read-lines item-card-text-h text-size14">[産地契約商品]北海道産トマト</p>
+							<div class="text-right">
+								<div class="flex items-baseline justify-end">
+									<span class="text-size14 color-gray-4 pr-2">1袋</span>
+									<p class="font-bold text-size16 price-color line_height_1">100円</p>
+								</div>
+								<p class="text-size14">税込188.11円</p>
+							</div>
+							<div>
+								<div class="relative mt-12px">
+									<div class="absolute left-0 position-top-center"> <a href="#" class="cart-item-cart-minus minus-button tx-button bg-color-gray-2 bg-color-gray-light w-44px h-24px"></a>
+									</div>
+									<div class="cart_num block text-size16 text-center tx-color-gray font-bold w-full h-7">1</div>
+									<div class="absolute right-0 position-top-center tx-button"> <a href="#" class="cart-item-cart-plus plus-button tx-button bg-color-gray-2 bg-color-gray-light w-44px h-24px"></a>
+									</div>
+								</div>
+							</div>
+							<div class="border-b-1 border-solid pt-20px"></div>
+						</li>';
+						}
+						?>
+					</ul>
 				</div>
-				<ul class="test flex flex-wrap ">
-					<li class="py-20px px-10px w-180px">
-						<div><img src="resouse/s_images/common/banana.png" width="60%" class="center-margin"></div>
-						<p class="mt-6 box-read-lines item-card-text-h text-size14">[産地契約商品]北海道産ブロッコリー</p>
-						<div class="text-right">
-							<div class="flex items-baseline justify-end">
-								<span class="text-size14 color-gray-4 pr-2">1袋</span>
-								<p class="font-bold text-size16 price-color line_height_1">100円</p>
-							</div>
-							<p class="text-size14">税込188.11円</p>
-						</div>
-						<div>
-							<div class="relative">
-								<div class="absolute left-0 position-top-center"> <a onclick="JavaScript:delCart('4903301017035','【第2類医薬品】ライオン スマイル40EXゴールド 13ml※お一人様1個まで','2021062401','');" class="cart-item-cart-minus minus-button tx-button bg-color-gray-2 bg-color-gray-light w-44px h-24px"></a>
-								</div>
-								<div class="cart_num block text-size16 text-center tx-color-gray font-bold w-full h-7">1</div>
-								<div class="absolute right-0 position-top-center tx-button"> <a onclick="JavaScript:setCart('4903301017035','【第2類医薬品】ライオン スマイル40EXゴールド 13ml※お一人様1個まで','2021062401','');" class="cart-item-cart-plus plus-button tx-button bg-color-gray-2 bg-color-gray-light w-44px h-24px"></a>
-								</div>
-							</div>
-						</div>
-						<div class="border-b-1 border-solid pt-20px"></div>
-					</li>
-					<li class="py-20px px-10px w-180px">
-						<div><img src="resouse/s_images/common/banana.png" width="60%" class="center-margin"></div>
-						<p class="mt-6 box-read-lines item-card-text-h text-size14">[産地契約商品]北海道産ブロッコリー</p>
-						<div class="text-right">
-							<div class="flex items-baseline justify-end">
-								<span class="text-size14 color-gray-4 pr-2">1袋</span>
-								<p class="font-bold text-size16 price-color line_height_1">100円</p>
-							</div>
-							<p class="text-size14">税込188.11円</p>
-						</div>
-						<div>
-							<div class="relative">
-								<div class="absolute left-0 position-top-center"> <a onclick="JavaScript:delCart('4903301017035','【第2類医薬品】ライオン スマイル40EXゴールド 13ml※お一人様1個まで','2021062401','');" class="cart-item-cart-minus minus-button tx-button bg-color-gray-2 bg-color-gray-light w-44px h-24px"></a>
-								</div>
-								<div class="cart_num block text-size16 text-center tx-color-gray font-bold w-full h-7">1</div>
-								<div class="absolute right-0 position-top-center tx-button"> <a onclick="JavaScript:setCart('4903301017035','【第2類医薬品】ライオン スマイル40EXゴールド 13ml※お一人様1個まで','2021062401','');" class="cart-item-cart-plus plus-button tx-button bg-color-gray-2 bg-color-gray-light w-44px h-24px"></a>
-								</div>
-							</div>
-						</div>
-						<div class="border-b-1 border-solid pt-20px"></div>
-					</li>
-					<li class="py-20px px-10px w-180px">
-						<div><img src="resouse/s_images/common/banana.png" width="60%" class="center-margin"></div>
-						<p class="mt-6 box-read-lines item-card-text-h text-size14">[産地契約商品]北海道産ブロッコリー</p>
-						<div class="text-right">
-							<div class="flex items-baseline justify-end">
-								<span class="text-size14 color-gray-4 pr-2">1袋</span>
-								<p class="font-bold text-size16 price-color line_height_1">100円</p>
-							</div>
-							<p class="text-size14">税込188.11円</p>
-						</div>
-						<div>
-							<div class="relative">
-								<div class="absolute left-0 position-top-center"> <a onclick="JavaScript:delCart('4903301017035','【第2類医薬品】ライオン スマイル40EXゴールド 13ml※お一人様1個まで','2021062401','');" class="cart-item-cart-minus minus-button tx-button bg-color-gray-2 bg-color-gray-light w-44px h-24px"></a>
-								</div>
-								<div class="cart_num block text-size16 text-center tx-color-gray font-bold w-full h-7">1</div>
-								<div class="absolute right-0 position-top-center tx-button"> <a onclick="JavaScript:setCart('4903301017035','【第2類医薬品】ライオン スマイル40EXゴールド 13ml※お一人様1個まで','2021062401','');" class="cart-item-cart-plus plus-button tx-button bg-color-gray-2 bg-color-gray-light w-44px h-24px"></a>
-								</div>
-							</div>
-						</div>
-						<div class="border-b-1 border-solid pt-20px"></div>
-					</li>
-				</ul>
 			</div>
 		</div>
 
@@ -826,9 +791,9 @@
 		<?php require("_parts/footer/footer.html") /* フッター */ ?>
 	</div>
 	<!--//wrap-->
-	<?php require("_parts/header/swaiperSetting.html")/* コンテンツトップ */ ?>
 </body>
 <!--//モーダル-->
 <script src="../resouse/n_js/jquery/modal.js"></script>
+<script src="../resouse/n_js/jquery/tab_maouseover.js"></script>
 
 </html>

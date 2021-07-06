@@ -458,9 +458,10 @@ ul.flex-list-3col > li {
 }
 
 .cart-contnet {
-  width: 370px;
+  width: 280px;
   padding: 10px 20px;
   background: var(--cart-bg-color);
+  border: 1px solid var(--cart-bg-color);
 }
 
 .cart-text-color {
@@ -612,37 +613,238 @@ nav li.has-child ul li a:active {
 
 /*ナビゲーションのリンク設定*/
 .cart-contnet {
-  transition: all 0.3s;
   position: relative;
 }
 
-.cart-contnet:hover {
-  background: #ffff;
-  border: 1px solid;
-}
-
 /*下の階層を持っているulの指定*/
-.test {
+.cart-item-list {
   /*絶対配置で位置を指定*/
   border: 1px solid;
   padding: 10px 10px 20px;
   position: absolute;
   right: -1px;
-  top: 133px;
+  top: 126px;
   z-index: 4;
+  max-width: 70vw;
+  max-height: 70vh;
+  overflow: scroll;
   /*形状を指定*/
   background: #fff;
   /*はじめは非表示*/
-  /* visibility: hidden;
-  opacity: 0; */
-  /*アニメーション設定*/
-  transition: all 0.3s;
+  visibility: hidden;
+  opacity: 0;
   color: #000;
 }
 
+.cart-item-list li + li:before {
+  content: "";
+  position: absolute;
+  width: 1px;
+  height: 235px;
+  margin: 0 -20px;
+  border-left: 1px dashed;
+  border-color: #e4e4e4;
+}
+
+.cart-item-close {
+  transform: scale(1.4, 1.1);
+  right: 12px;
+  top: 10px;
+}
+
 /*hoverしたら表示*/
-.cart-contnet:hover > .test,
-.cart-contnet:active > .test {
+
+.active {
   visibility: visible;
   opacity: 1;
+}
+
+.active_cart {
+  background: #fff;
+  border: 1px solid;
+}
+
+.active_no {
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
+
+.active_cart_no {
+  background: var(--cart-bg-color) !important;
+  border: 1px solid var(--cart-bg-color) !important;
+}
+
+.st-menu {
+  /* iPadでもハンバーガーメニュー押下時の表示崩れが起こらないよう設定 */
+  width: 100%;
+  height: 100%;
+  z-index: 100000;
+  /* 原則、表示階層が最上部になるよう設定 */
+}
+
+.st-menu-main {
+  /* iPadでもハンバーガーメニュー押下時の表示崩れが起こらないよう設定 */
+  height: 100%;
+}
+
+.st-menu-bg {
+  /* iPadでもハンバーガーメニュー押下時の表示崩れが起こらないよう設定 */
+  height: 100%;
+}
+
+.container {
+  min-width: auto;
+}
+
+.st-header-large {
+  min-width: 1280px;
+}
+
+.st-header-wrap-tkb-logo {
+  width: 360px;
+}
+
+.st-menu {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 300;
+  display: none;
+}
+
+.st-menu-bg {
+  width: 100%;
+  height: 100vh;
+  cursor: pointer;
+  background-color: rgba(0, 0, 0, 0.7);
+}
+
+.st-menu-main {
+  width: 360px;
+  height: 100vh;
+  padding: 30px;
+  background-color: #ffffff;
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.st-menu-main-welcome {
+  font-size: 1.8rem;
+  margin-bottom: 14px;
+}
+
+.st-menu-main-name {
+  font-size: 1.8rem;
+  font-weight: bold;
+  margin-bottom: 18px;
+}
+
+.st-menu-main-point {
+  font-size: 1.4rem;
+  font-weight: bold;
+  margin-bottom: 23px;
+}
+
+.st-menu-main-close {
+  position: absolute;
+  top: 20px;
+  right: 25px;
+  cursor: pointer;
+}
+
+.st-menu-main ul {
+  border-top: solid 1px #dddddd;
+  width: 300px;
+  list-style: none;
+}
+
+.st-menu-main ul li {
+  height: 55px;
+  line-height: 55px;
+  font-weight: bold;
+  border-bottom: dotted 1px #dddddd;
+}
+
+.menu-btn {
+  position: absolute;
+  top: 0px;
+  right: 10px;
+  display: flex;
+  height: 60px;
+  width: 60px;
+  justify-content: center;
+  align-items: center;
+  z-index: 60;
+}
+.menu-btn span,
+.menu-btn span:before,
+.menu-btn span:after {
+  content: "";
+  display: block;
+  height: 3px;
+  width: 25px;
+  border-radius: 3px;
+  background-color: #000;
+  position: absolute;
+}
+.menu-btn span:before {
+  bottom: 8px;
+}
+.menu-btn span:after {
+  top: 8px;
+}
+
+.menu-content {
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  top: 0;
+  left: 100%; /*leftの値を変更してメニューを画面外へ*/
+  opacity: 0;
+  visibility: hidden;
+  z-index: 80;
+  transition: all 0.2s; /*アニメーション設定*/
+}
+
+#menu-btn-check:checked ~ .menu-content {
+  left: 0; /*メニューを画面内へ*/
+  opacity: 1;
+  visibility: visible;
+}
+
+#menu-btn-check {
+  display: none;
+}
+
+.batsu {
+  display: block;
+  width: 30px;
+  height: 30px;
+  position: absolute;
+  left: -40px;
+  top: 30px;
+}
+
+.batsu::before,
+.batsu::after {
+  content: "";
+  display: block;
+  width: 100%;
+  height: 4px;
+  background: #fff;
+  transform: rotate(45deg);
+  transform-origin: 0% 50%;
+  position: absolute;
+  top: calc(14% - 5px);
+  left: 16%;
+}
+
+.batsu::after {
+  transform: rotate(-45deg);
+  transform-origin: 100% 50%;
+  left: auto;
+  right: 14%;
 }
