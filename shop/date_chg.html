@@ -1,0 +1,27 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja" lang="ja">
+<head>
+<?php echo $this->render('_parts/header.html') /* ヘッダーファイル追加   */ ?>
+<script type="text/javascript" src="<?php echo $this->escape($this->common_url); ?>f_js/input_check.js"></script>
+<script type="text/javascript">
+<!--
+function input_check(fm){
+	if(!totalCheck(fm.delivery, '配達時間帯', true, false, false, false, false) ) return false;
+}
+-->
+</script>
+</head>
+<body id="top">
+	<div id="wrap">
+		<div id="header">
+
+
+				<br class="left" />
+<?php echo $this->render('_parts/footer/footerBnr.html') /* フッターバナー */ ?>
+			<!--//main--></div>
+		<!--//container--></div>
+<?php echo $this->render('_parts/footer/footer.html') /* フッター */ ?>
+	<!--//wrap--></div>
+<?php echo $this->render('_parts/footer/analytics.html') /* Google Analytics */ ?>
+</body>
+</html>

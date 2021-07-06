@@ -1,0 +1,225 @@
+<div id="sideMenu"
+	class="fixed h-full z-50 w-10/12 bg-white flex top-0 left-0 transition-all duration-500
+		transform translate-x-0 xl:px-0 flex-col xl:flex-row 
+		-translate-x-full yl:translate-x-0 xl:mt-1 xl:items-center xl:mx-1 xl:uppercase
+		tx-size12 whitespace-no-wrap">
+	<div class="overflow-y-scroll h-full">
+	<?php if (isset($this->isLogin) && $this->isLogin == true) { ?>
+		<div class="relative bg-color-gray-light block">
+			<p class="font-semibold pl-4 pt-3 pb-3 bd-b-color-gray"><?php echo $this->escape($this->member_data['name1'].' '.$this->member_data['name2']); ?>様</p>
+	<?php
+	//	if ( $this->order_limit_time != '' || $this->add_item_mode) {
+			// 追加注文モードの時はレジへボタンの送信先を変更
+			if ( ! $this->add_item_mode ) {
+				$order_edt = 'order_edt.php';
+			}else{
+				$order_edt = 'add_order_edt.php';
+			}
+	?>
+			<div class="absolute top-0 right-0 mr-2 mt-1 p-2">
+				<div class="flex ml-4">
+					<a href="<?php echo $this->escape($this->top_page); ?>order/<?php echo $this->escape($this->shop_code); ?>/<?php echo $this->escape($order_edt); ?>" class="button button4">
+						<img class="block w-50" src="<?php echo $this->escape($this->img_url); ?>common/menu_cart_btn.png">
+					</a>
+					<div class="block -ml-3 -mt-2 align-text-top">
+						<div id = "cart_sum_h" class="maru mt-1 bg-white text-red-500 font-bold text-size10">
+							<sapn><?php echo (isset($this->order_data) && is_array($this->order_data['cart_detail']))?count($this->order_data['cart_detail']):0; ?></span>
+						</div>
+					</div >
+				</div >
+			</div >
+	<?php //} ?>
+			<div class="ml-4 mt-1">保有ポイント：<?php echo isset($this->member_data['point'])?$this->escape($this->member_data['point']):0; ?>pt</div>
+			<div class="ml-4 mb-2">現在のカート内小計：<span id="sum_price_menu"><?php echo number_format($this->escape($this->cart_price)) ?>円</span></div>
+		</div>
+
+		<a href="<?php echo $this->escape($this->top_page); ?>shop/<?php echo $this->escape($this->shop_code) ?>/item_lst.php?cmpn=1&ctlt=1" class="block text-size12 text-center tx-base bd-color-gray m-4 p-1">
+			トップ画面に戻る
+		</a>
+	<?php } else { ?>
+		<a href="<?php echo $this->escape($this->top_page); ?>index.php" class="block text-size12 text-center tx-base bd-color-gray m-4 p-1">
+			トップ画面に戻る
+		</a>
+	<?php } ?>
+
+	<?php if (isset($this->isLogin) && $this->isLogin == true) { ?>
+		<div class="flex flex-no-wrap items-center justify-center vertical-middle bg-color-gray-light-more mt-1 mb-1">
+			<div class="flex-initial pl-2">
+				<img src="<?php echo $this->escape($this->img_url); ?>/common/menu-notice.png" class="w-20">
+			</div>
+			<div class="flex-auto relative">
+				<b><a href="<?php echo $this->escape($this->top_page); ?>news/index.php" class="block pt-4 pb-4 pl-3 hover:tx-color4">お知らせ</a></b>
+			</div>
+			<div class="flex-auto arrow pr-2 pb-3 right-0"></div>
+		</div>
+		<div class="flex flex-no-wrap items-center bg-color-gray-light-more mt-1 mb-1">
+			<div class="flex-initial pl-2">
+				<img src="<?php echo $this->escape($this->img_url); ?>/common/menu-account.png" class="w-20">
+			</div>
+			<div class="flex-auto relative">
+				<b><a href="<?php echo $this->escape($this->top_page); ?>mypage/index.php" class="block h-9 leading-9 pt-4 pb-4 pl-3 hover:tx-color4">マイページ</a></b>
+			</div>
+			<div class="flex-auto arrow pr-2 pb-3 right-0"></div>
+		</div>
+		<div class="flex flex-no-wrap items-center border-b ml-5">
+			<div class="flex-auto relative">
+				<b><a href="<?php echo $this->escape($this->top_page); ?>mypage/infoedit_idx.php" class="block h-9 leading-9 pt-4 pb-4 pl-3 hover:tx-color4">会員情報</a></b>
+			</div>
+			<div class="flex-auto arrow pr-2 pb-3 right-0"></div>
+		</div>
+		<div class="flex flex-no-wrap items-center border-b ml-5">
+			<div class="flex-auto relative">
+				<b><a href="<?php echo $this->escape($this->top_page); ?>mypage/infoedit_idx.php" class="block h-9 leading-9 pt-4 pb-4 pl-3 hover:tx-color4">注文ステータス</a></b>
+			</div>
+			<div class="flex-auto arrow pr-2 pb-3 right-0"></div>
+		</div>
+		<div class="flex flex-no-wrap items-center border-b ml-5">
+			<div class="flex-auto relative">
+				<b><a href="<?php echo $this->escape($this->top_page); ?>mypage/delivery/address_chg.php" class="block h-9 leading-9 pt-4 pb-4 pl-3 hover:tx-color4">配送先</a></b>
+			</div>
+			<div class="flex-auto arrow pr-2 pb-3 right-0"></div>
+		</div>
+		<div class="flex flex-no-wrap items-center border-b ml-5">
+			<div class="flex-auto relative">
+				<b><a href="<?php echo $this->escape($this->top_page); ?>mypage/finished/history_lst.php" class="block h-9 leading-9 pt-4 pb-4 pl-3 hover:tx-color4">購入履歴</a></b>
+			</div>
+			<div class="flex-auto arrow pr-2 pb-3 right-0"></div>
+		</div>
+		<div class="flex flex-no-wrap items-center border-b ml-5">
+			<div class="flex-auto relative">
+				<b><a href="<?php echo $this->escape($this->top_page); ?>mypage/loyalty/point_history_lst.php" class="block h-9 leading-9 pt-4 pb-4 pl-3 hover:tx-color4">ランク/ポイント</a></b>
+			</div>
+			<div class="flex-auto arrow pr-2 pb-3 right-0"></div>
+		</div>
+		<div class="flex flex-no-wrap items-center border-b ml-5">
+			<div class="flex-auto relative">
+				<b><a href="" class="block h-9 leading-9 pt-4 pb-4 pl-3 hover:tx-color4">クーポン⼀覧</a></b>
+			</div>
+			<div class="flex-auto arrow pr-2 pb-3 right-0"></div>
+		</div>
+		<div class="flex flex-no-wrap items-center border-b ml-5">
+			<div class="flex-auto relative">
+				<b><a href="" class="block h-9 leading-9 pt-4 pb-4 pl-3 hover:tx-color4">各種お手続き（メール設定/退会）</a></b>
+			</div>
+			<div class="flex-auto arrow pr-2 pb-3 right-0"></div>
+		</div>
+		<div class="flex flex-no-wrap items-center border-b ml-5">
+			<div class="flex-auto relative">
+				<b><a href="<?php echo $this->escape($this->top_page); ?>mypage/inquiry/index.php" class="block h-9 leading-9 pt-4 pb-4 pl-3 hover:tx-color4">お問い合わせ</a></b>
+			</div>
+			<div class="flex-auto arrow pr-2 pb-3 right-0"></div>
+		</div>
+		<div class="flex flex-no-wrap items-center border-b ml-5">
+			<div class="flex-auto relative">
+				<b><a href="" class="block h-9 leading-9 pt-4 pb-4 pl-3 hover:tx-color4">各種お手続き（メール設定/退会）</a></b>
+			</div>
+			<div class="flex-auto arrow pr-2 pb-3 right-0"></div>
+		</div>
+		<div class="flex flex-no-wrap items-center bg-color-gray-light-more mt-1 mb-1">
+			<div class="flex-initial pl-2">
+				<img src="<?php echo $this->escape($this->img_url); ?>/common/menu-favorite.png" class="w-20">
+			</div>
+			<div class="flex-auto relative">
+				<b><a href="<?php echo $this->escape($this->top_page); ?>shop/<?php echo $this->escape($this->shop_code) ?>/item_lst.php?fvrt=1" class="block h-9 leading-9 pt-4 pb-4 pl-3 hover:tx-color4">お気に入り</a></b>
+			</div>
+			<div class="flex-auto arrow pr-2 pb-3 right-0"></div>
+		</div>
+		<div class="flex flex-no-wrap items-center bg-color-gray-light-more mt-1 mb-1">
+			<div class="flex-initial pl-2">
+				<img src="<?php echo $this->escape($this->img_url); ?>/common/menu-service.png" class="w-20">
+			</div>
+			<div class="flex-auto relative">
+				<b><a href="<?php echo $this->escape($this->top_page); ?>outline/index.php" class="block h-9 leading-9 pt-4 pb-4 pl-3 hover:tx-color4">サービス概要</a></b>
+			</div>
+			<div class="flex-auto arrow pr-2 pb-3 right-0"></div>
+		</div>
+	<?php } ?>
+		<div class="flex flex-no-wrap items-center bg-color-gray-light-more mt-1 mb-1">
+			<div class="flex-initial pl-2">
+				<img src="<?php echo $this->escape($this->img_url); ?>/common/menu-question.png" class="w-20">
+			</div>
+			<div class="flex-auto relative">
+				<b><a href="<?php echo $this->escape($this->top_page); ?>faq/index.php" class="block h-9 leading-9 pt-4 pb-4 pl-3 hover:tx-color4">よくあるご質問</a></b>
+			</div>
+			<div class="flex-auto arrow pr-2 pb-3 right-0"></div>
+		</div>
+		<div class="flex flex-no-wrap items-center border-b ml-5">
+			<div class="flex-auto relative">
+				<b><a href="<?php echo $this->escape($this->top_page); ?>transaction/index.php" class="block h-9 leading-9 pt-4 pb-4 pl-3 hover:tx-color4">特定商取引法に基づく表示</a></b>
+			</div>
+			<div class="flex-auto arrow pr-2 pb-3 right-0"></div>
+		</div>
+		<div class="flex flex-no-wrap items-center border-b ml-5">
+			<div class="flex-auto relative">
+				<b><a href="" class="block h-9 leading-9 pt-4 pb-4 pl-3 hover:tx-color4">医薬品販売に関するご案内</a></b>
+			</div>
+			<div class="flex-auto arrow pr-2 pb-3 right-0"></div>
+		</div>
+		<div class="flex flex-no-wrap items-center border-b ml-5">
+			<div class="flex-auto relative">
+				<b><a href="<?php echo $this->escape($this->top_page); ?>attension/index.php" class="block h-9 leading-9 pt-4 pb-4 pl-3 hover:tx-color4">ご注意事項</a></b>
+			</div>
+			<div class="flex-auto arrow pr-2 pb-3 right-0"></div>
+		</div>
+		<div class="flex flex-no-wrap items-center border-b ml-5">
+			<div class="flex-auto relative">
+				<b><a href="<?php echo $this->escape($this->top_page); ?>privacy/index.php" class="block h-9 leading-9 pt-4 pb-4 pl-3 hover:tx-color4">プライバシーポリシー</a></b>
+			</div>
+			<div class="flex-auto arrow pr-2 pb-3 right-0"></div>
+		</div>
+		<div class="flex flex-no-wrap items-center border-b ml-5">
+			<div class="flex-auto relative">
+				<b><a href="<?php echo $this->escape($this->top_page); ?>agreement/index.php" class="block h-9 leading-9 pt-4 pb-4 pl-3 hover:tx-color4">会員規約</a></b>
+			</div>
+			<div class="flex-auto arrow pr-2 pb-3 right-0"></div>
+		</div>
+		<div class="flex flex-no-wrap items-center border-b ml-5">
+			<div class="flex-auto relative">
+				<b><a href="javascript:DeleteArc('<?php echo $this->escape($this->comp_profile); ?>','外部サイトに移動します。\n外部サイトはスマートフォンで最適な表示がされない場合があります。');" class="block h-9 leading-9 mt-3 mb-3 ml-2 bd-color4 hover:tx-color4" class="block h-9 leading-9 pt-4 pb-4 pl-3 hover:tx-color4">会社概要</a></b>
+			</div>
+			<div class="flex-auto arrow pr-2 pb-3 right-0"></div>
+		</div>
+	<?php if (isset($this->isLogin) && $this->isLogin == true) { ?>
+		<a href="<?php echo $this->escape($this->top_page); ?>logout.php" class="block text-center tx-base text-size12 bd-color-gray m-4 p-1">ログアウト</a>
+	<?php } ?>
+	</div>
+</div>
+<script>
+	var MenuButton = document.getElementById("MenuButton");
+	MenuButton.onclick = function() {
+		document.getElementById("sideMenu").classList.toggle("-translate-x-full");
+		document.getElementById("sideMenu").classList.toggle("shadow");
+		document.getElementById("MenuButtonClose").classList.toggle("hidden");
+		document.getElementById("MenuButtonOpen").classList.toggle("hidden");
+	}
+	// Hide element when click outside nav
+	var theElementContainer = document.getElementsByTagName("nav")[0];
+	document.addEventListener('click', function(event) {
+		if (!theElementContainer.contains(event.target)) {
+			document.getElementById("sideMenu").classList.add("-translate-x-full");
+			document.getElementById("sideMenu").classList.remove("shadow");
+			document.getElementById("MenuButtonOpen").classList.remove("hidden");
+			document.getElementById("MenuButtonClose").classList.add("hidden");
+		}
+	});
+
+	$(function(){
+		//モーダルウィンドウを出現させるクリックイベント
+		$("#MenuButtonOpen").click( function(){
+			if( $( "#modal-overlay" )[0] ) return false ;		//新しくモーダルウィンドウを起動しない (防止策1)
+
+			//オーバーレイを出現させる
+			$( "body" ).append( '<div id="modal-overlay"></div>' ) ;
+			$( "#modal-overlay" ).fadeIn( "fast" ) ;
+
+			//モーダルウィンドウを閉じるクリックイベント
+			$("#modal-overlay, #MenuButtonClose").unbind().click( function(){
+				$( "#modal-overlay" ).fadeOut( "fast" , function(){
+					//[#modal-overlay]を削除する
+					$('#modal-overlay').remove() ;
+				} ) ;
+			} ) ;
+		} ) ;
+	} );
+
+</script>

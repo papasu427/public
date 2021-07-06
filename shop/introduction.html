@@ -1,0 +1,45 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja" lang="ja">
+<head>
+<?php echo $this->render('_parts/header.html'); /* ヘッダーファイル追加   */ ?>
+</head>
+<body>
+	<div id="wrap">
+<?php echo $this->render('_parts/contents_top.html'); /* コンテンツトップ */ ?>
+		<article id="container">
+
+<?php if(isset($this->banner_data[11]) && $this->banner_data[11] != false): ?>
+	<?php foreach($this->banner_data[11] as $key => $val): ?>
+<div class="Box" style="padding:0px;margin:0px">
+		<?php if(strlen($val['img_file']) > 0): ?>
+			<?php if(strlen($val['link_url']) > 0): ?>
+	<a href="<?php echo $this->escape($val['link_url']); ?>" <?php if($val['target_flg'] ==1){ echo 'target="_blank"'; } ?>>
+		<img src="<?php echo $this->escape($this->common_banner_url); ?><?php echo $this->escape($val['img_file']); ?>" width="100%"/>
+	</a>
+			<?php else: ?>
+	<img src="<?php echo $this->escape($this->common_banner_url); ?><?php echo $this->escape($val['img_file']); ?>" width="100%" />
+			<?php endif; ?>
+		<?php elseif(strlen($val['tag_text']) > 0): ?>
+			<?php echo $val['tag_text']; ?>
+		<?php endif; ?>
+</div>
+	<?php endforeach; ?>
+
+<?php endif; ?>
+<div class="loginFormBox">
+<?php if ($this->isLogin) { ?>
+<p><a href="javascript:history.back();" class="button button1">戻る</a></p>
+<?php } else { ?>
+<div class="loginFormButton">
+	<div class="submitBox"><a href="<?php echo $this->escape($this->top_page.'shop/'.$this->area_shop[0]['shop_code'].'/date_sel.php'); ?>" class="button button1">店内見学</a></div>
+	<div class="submitBox"><a href="<?php echo $this->escape($this->top_page.'user/index.php'); ?>" class="button button2">会員登録はこちら</a></div>
+</div>
+<?php } ?>
+<!--//Box--></div>
+
+		</article>
+<?php echo $this->render('_parts/footer/footer.html'); /* フッター */ ?>
+	<!--wrap--></div>
+<?php echo $this->render('_parts/footer/analytics.html'); /* Google Analytics */ ?>
+</body>
+</html>

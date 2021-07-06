@@ -1,0 +1,149 @@
+<!DOCTYPE>
+<html lang="ja">
+<head>
+<?php echo $this->render('_parts/header.html'); /* ヘッダーファイル追加   */ ?>
+<script src="<?php echo $this->escape($this->common_url); ?>n_js/item_list_more.js?ts=201310041800"></script>
+<?php
+if ($this->tour_flg) {
+?>
+<scrip src="<?php echo $this->escape($this->common_url); ?>n_js/item_list_tour.js"></script>
+<?php
+} else {
+?>
+<script src="<?php echo $this->escape($this->common_url); ?>n_js/item_list.js"></script>
+	<?php
+	}
+?>
+<script src="<?php echo $this->escape($this->common_url); ?>n_js/item_category_list.js"></script>
+<script src="<?php echo $this->escape($this->common_url); ?>n_js/jquery/jquery.colorbox.js"></script>
+<script src="<?php echo $this->escape($this->common_url); ?>n_js/jquery/jquery.growl.js"></script>
+
+<link rel="stylesheet" href="<?php echo $this->escape($this->common_url); ?>n_css/jquery.growl.css">
+
+<script>
+// 商品詳細ページ移動
+function move_detail(item_code, category_code, list_type) {
+	location.href = 'item_dtl.php?itcd='+item_code+'&ctcd='+category_code+'&mode=ITEM_LST';
+	return true;
+}
+// 注意喚起ページ移動
+function move_medicine_attention(item_code, category_code, seq, list_type) {
+	var arg = 'medicine_attention_dtl.php?itcd='+item_code+'&ctcd='+category_code+'&mode=ITEM_LST';
+	if (seq != undefined && seq.length > 0) {
+		var select = document.getElementsByName('p_item_num['+seq+']')[0];
+		var p_item_num = select.options[select.selectedIndex].value;
+		if(p_item_num.length > 0) {
+			arg += '&p_item_num='+p_item_num;
+		}
+	}
+	location.href = arg;
+	return true;
+}
+function resaleMedicineAlert(resale_date) {
+	alert('前回購入日より' + resale_date + '日以上経過していないためご購入いただけません。');
+	return false;
+}
+-->
+</script>
+</head>
+<body onload="flg_reset();" id="top">
+	<article id="container">
+<?php $this->render('_parts/modules/searchItemBox.html'); /* 検索ボックス */ ?>
+<?php $this->render('_parts/modules/aboutDeliveryDate.html'); /* 配達時間 */ ?>
+<?php $this->render('_parts/side/menuShop.html') /* 店舗メニュー */ ?>
+
+<?php $this->banner_type=9; ?>
+<?php $this->render('_parts/modules/flickableBanner.html'); ?>
+<?php
+if (isset($this->srh_hit_category)
+		&& $this->srh_hit_category != array()
+		&& isset($this->srh_hit_category['list'])) {
+?>
+<div id="top" class="Box searchCategoryBox">
+	<h2 class="title">「<?php echo $this->escape($this->srh_hit_category['word']); ?>」を含むカテゴリ</h2>
+	<ul>
+<?php
+		foreach ($this->srh_hit_category['list'] as $_list_val) {
+			echo '<li>';
+			foreach ($_list_val as $_key => $_val) {
+				if ($_key == 0) {
+					echo '・';
+				} else {
+					echo '>';
+				}
+				echo '<a href="'.$this->escape($_val['url']).'">'.$this->escape($_val['name']).'</a>';
+			}
+		}
+?>
+	</ul>
+</div>
+<?php
+}
+
+if (! $this->item_exists) {
+?>
+	<div class="mg-width5 table table-fixed mx-10pt px-10-20pt w-full">
+		<div class="table-row">
+			<div class="table-cell tx-size13 whitespace-no-wrap"><strong><?php echo $this->escape($this->list_caption); ?></strong></div>
+			<div class="table-cell text-right tx-size10 tx-color1">商品が見つかりませんでした。</div>
+		</div>
+	</div>
+<?php 
+} else {
+	if (is_array($this->item_data)) {
+		// 画像ありのテンプレート
+		echo $this->render('_parts/modules/itemListImage.html');
+
+		if ( ! $this->tour_flg ) {
+			echo '<form name="favorite_set" action="favorite_set.php" method="post" class="mb-0">'."\n";
+			echo '	<input type="hidden" name="tkn" value="'.$this->escape($this->tkn).'" />'."\n";
+			echo '	<input type="hidden" name="p_item_code" value="" />'."\n";
+			echo '	<input type="hidden" name="p_event_id" value="" />'."\n";
+			echo '	<input type="hidden" name="p_group_code" value="" />'."\n";
+			echo '	<input type="hidden" name="p_list_file" value="'.$this->escape(basename($this->url)).'" />'."\n";
+			echo '</form>'."\n";
+			echo '<form name="favorite_del" action="favorite_set.php" method="post" class="mb-0">'."\n";
+			echo '	<input type="hidden" name="tkn" value="'.$this->escape($this->tkn).'" />'."\n";
+			echo '	<input type="hidden" name="p_item_code" value="" />'."\n";
+			echo '	<input type="hidden" name="p_event_id" value="" />'."\n";
+			echo '	<input type="hidden" name="p_group_code" value="" />'."\n";
+			echo '	<input type="hidden" name="set" value="delete" />'."\n";
+			echo '	<input type="hidden" name="p_list_file" value="'.$this->escape(basename($this->url)).'" />'."\n";
+			echo '</form>'."\n";
+
+			//追加注文の区別はしない
+			$form_action = 'cart_set.php';
+			echo '<form name="cart_set" action="'.$this->escape($form_action).'" method="post" class="mb-0">'."\n";
+			echo '	<input type="hidden" name="tkn" value="'.$this->escape($this->tkn).'" />'."\n";
+			echo '	<input type="hidden" name="p_item_code" value="" />'."\n";
+			echo '	<input type="hidden" name="p_campain_item" value="" />'."\n";
+			echo '	<input type="hidden" name="p_event_id" value="" />'."\n";
+			echo '	<input type="hidden" name="p_group_code" value="" />'."\n";
+			echo '	<input type="hidden" name="p_item_num" value="" />'."\n";
+			echo '	<input type="hidden" name="p_list_file" value="'.$this->escape(basename($this->url)).'" />'."\n";
+			echo '	<input type="hidden" name="p_error" value="" />'."\n";
+			echo '</form>'."\n";
+		}
+	}
+}
+?>
+
+		<form name="error_list" action="<?php echo $this->escape($this->top_page.'error.php') ?>" method="post" class="mb-0">
+			<input type="hidden" name="output_flg" value="" />
+			<input type="hidden" name="error_file" value="" />
+			<input type="hidden" name="error_line" value="" />
+			<input type="hidden" name="error_type" value="" />
+			<input type="hidden" name="error_msg" value="" />
+			<input type="hidden" name="next_file" value="" />
+			<input type="hidden" name="comment" value="" />
+		</form>
+
+<?php echo $this->render('_parts/modules/aboutPoint.html'); /* ポイントについて */ ?>
+<?php echo $this->render('_parts/modules/aboutShopDataBox.html'); /* 担当店舗について */ ?>
+<?php $this->render('_parts/modules/aboutManifest.html'); /* 医薬品販売適合証 */ ?>
+
+	</article>
+<?php echo $this->render('_parts/footer/footerShop.html'); /* フッター */ ?>
+<?php echo $this->render('_parts/footer/analytics.html'); /* Google Analytics */ ?>
+</body>
+</html>

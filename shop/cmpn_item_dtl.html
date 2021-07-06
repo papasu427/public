@@ -1,0 +1,291 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja" lang="ja">
+<head>
+<?php echo $this->render('_parts/header.html'); /* ヘッダーファイル追加   */ ?>
+<script type="text/javascript" src="<?php echo $this->escape($this->common_url); ?>n_js/item_category_list.js"></script>
+<script type="text/javascript">
+<!--
+//-->
+</script>
+<?php
+	// 医薬品情報の表示フラグ
+	if($this->medicine_dealing_flg == 1 && $this->item_data_info['buy_limit_type'] == 9
+		&& isset($this->medicine_data_info) && is_array($this->medicine_data_info) && count($this->medicine_data_info) > 0
+		&& isset($this->medicine_shop_inquiry) && is_array($this->medicine_shop_inquiry) && count($this->medicine_shop_inquiry) > 0
+	){
+		$medicine_display_flg = true;
+	} else {
+		$medicine_display_flg = false;
+	}
+?>
+</head>
+<body>
+	<div id="wrap">
+<?php echo $this->render('_parts/contents_top.html'); /* コンテンツトップ */ ?>
+		<article id="container">
+			<div id="boxOpen999" class="itemCategoryTabBox">
+
+				<ul class="itemCategoryTabList clearfix">
+
+					<li class="tabMenu"><a href="date_sel.php" class="button buttonTab" title="配達便選択">配達便選択</a></li>
+					<li class="tabMenu"><a href="#" class="button buttonTab" title="<?php echo $this->str_cmpn_label; ?>" onclick="showPlagin(999);return false;"><?php echo $this->str_cmpn_label; ?></a></li>
+					<li class="tabMenu"><a href="#searchItem" class="button buttonTab">商品検索</a></li>
+
+				</ul>
+
+			</div>
+			<div id="boxClose999" class="itemCategoryTabBox" style="display:none" >
+				<ul class="itemCategoryTabList clearfix">
+					<li class="tabMenu"><a href="date_sel.php" class="button buttonTab" title="配達便選択">配達便選択</a></li>
+					<li class="tabMenu"><a href="#" class="button buttonTab" title="<?php echo $this->str_cmpn_label; ?>" onclick="showPlagin(999);return false;"><?php echo $this->str_cmpn_label; ?></a></li>
+					<li class="tabMenu"><a href="#searchItem" class="button buttonTab">商品検索</a></li>
+				</ul>
+					<h2 class="title" style="margin-top:2px"><?php echo $this->str_cmpn_label; ?></h2>
+					<div class="timeline" >
+						<form name="item_list" action="" method="post" id="itemListForm">
+							<div id=cmpn_list">
+	<?php foreach($this->cmpn_data as $key => $cmpn_val): ?>
+								<div class="itemListBox" id="d_<?php echo $this->escape($cmpn_val['event_id']); ?>">
+									<div class="itemInfoBox">
+										<a href="cmpn_item_lst.php?evid=<?php echo $this->escape($cmpn_val['event_id']); ?>" class="itemListLink">
+											<div class="itemTextBox">
+												<p class="itemTitle"><?php echo $this->escape($cmpn_val['event_name']); ?>
+			<?php if($cmpn_val['disp_date_flg'] == 0): ?>
+												<br/><?php echo $this->escape($cmpn_val['disp_event_date']); ?>
+				<?php if(isset($cmpn_val['disp_week_str']) && strlen($cmpn_val['disp_week_str']) > 0): ?>
+													<br/><?php echo $this->escape($cmpn_val['disp_week_str']); ?>
+				<?php endif; ?>
+			<?php endif; ?>
+												</p>
+											</div>
+										</a>
+									</div>
+								<!--//itemListBox--></div>
+	<?php endforeach; ?>
+							<!--//updates--></div>
+						</form>
+					<!--//timeline--></div>
+			<!--//boxClose--></div>
+
+<div class="Box">
+	<h2 class="title"><?php echo $this->escape($this->campaign_event_data['event_name']); ?>
+	<?php if($this->campaign_event_data['disp_date_flg'] == 0): ?>
+		<br/><?php echo $this->escape($this->campaign_event_data['disp_event_date']); ?>
+	<?php endif; ?>
+	</h2>
+</div>
+
+			<div class="Box" id="itemDetail">
+				<div class="itemDetailBox">
+					<div class="itemInfoBox">
+						<p class="itemTitle"><?php echo $this->escape($this->item_data_info['disp_item_name']); ?></p>
+						<p class="itemImages"><img src="<?php echo $this->escape($this->box_url.$this->item_data_info['item_image']);?>" class="itemThumbImages_l" alt="<?php echo $this->escape($this->item_data_info['disp_item_name']); ?>" /></p>
+						<p class="itemIcon">
+<?php if(count($this->item_data_info['item_icon']) > 0): ?>
+<?php 	foreach($this->item_data_info['item_icon'] as $key => $val): ?>
+								<img src="<?php echo $this->escape($val['url']); ?>" alt="<?php echo $this->escape($val['alt']); ?>" />
+<?php 	endforeach; ?>
+<?php endif; ?>
+						</p>
+<?php if($medicine_display_flg): ?>
+						<div class="medicineComment">
+							<div class="medicine-category">医薬品分類：<?php echo $this->escape($this->medicine_data_info['medicine_group_value']); ?></div>
+	<?php if(isset($this->item_data_info['maker_description_url']) && strlen($this->item_data_info['maker_description_url']) > 0): ?>
+							<div class="medicine-maker-caption"><a href="<?php echo $this->escape($this->item_data_info['maker_description_url']); ?>" target="_blank">メーカー説明ファイル</a></div>
+	<?php endif; ?>
+						</div>
+<?php else: ?>
+<?php if( strlen($this->item_data_info['comment']) > 0 ): ?>
+						<p class="itemComment"><?php echo $this->item_data_info['comment']; ?></p>
+<?php endif; ?>
+<?php endif; ?>
+
+<?php if( count($this->item_data_info['announce']) > 0 ): ?>
+						<p class="itemAnnounce">
+<?php 	foreach($this->item_data_info['announce'] as $val): ?>
+							<?php echo $this->escape($val); ?><br/>
+<?php 	endforeach; ?>
+						</p>
+<?php endif; ?>
+<?php
+// ポイント倍付け商品とそうでない商品で表示する価格が異なるため、それを決定する
+$base_price = null;
+$intax_price = null;
+if ($this->campaign_event_data['event_type_flg'] == 1) {
+	// ポイント倍付けのときは標準価格
+	$base_price = $this->item_data_info['sell_base_price'];
+	$intax_price = $this->item_data_info['sell_price'];
+} else {
+	$base_price = $this->item_data_info['selling_base_price'];
+	$intax_price = $this->item_data_info['selling_price'];
+}
+
+
+?>
+
+<?php //軽減税率表示対応 START ?>
+<?php $tax_disp = ''; ?>
+<?php $reduced_tax_disp = $this->getSetting('reduced_tax_disp'); ?>
+<?php $reduced_none_tax_disp = $this->getSetting('reduced_none_tax_disp'); ?>
+<?php $reduced_tax_disp_flg = false; ?>
+<?php $reduced_tax_start_date = _ASP_REDUCED_TAX_START_DATE; ?>
+<?php if (strlen($reduced_tax_disp) > 0 && $reduced_tax_start_date <= date('Y-m-d')) {
+	//軽減税率導入後は税率を表示する
+	$reduced_tax_disp_flg = true;
+
+	//表示内容をセットする
+	if ($this->item_data_info['tax_rate'] == 0) {
+		$tax_disp = $reduced_none_tax_disp;
+	} else {
+		$tax_disp = $this->getSetting('reduced_tax_disp',array($this->item_data_info['tax_rate']));
+	}
+} ?>
+<?php //軽減税率表示対応 END ?>
+
+<?php if ($this->price_display_type == '0') {
+	// 商品マスタ表示価格タイプ 0:税込価格	?>
+						<p class="itemPrice">
+						<span class="itemPrice"><?php echo number_format($this->escape($intax_price),$this->number_of_digits); ?></span>円&nbsp;<span class="small zeikomi"><?php echo $this->escape($tax_disp); ?></span></p>
+<?php } else if ($this->price_display_type == '1') {
+	// 商品マスタ表示価格タイプ 1:本体価格表示のみ	?>
+						<p class="itemPrice">
+						本体&nbsp;<span class="itemPrice"><?php echo number_format($this->escape($base_price)); ?></span>円&nbsp;<span class="small zeikomi"><?php echo $this->escape($tax_disp); ?></span>
+						</p>
+<?php } else {
+	// 商品マスタ表示価格タイプ 9:両方の価格表示	?>
+						<p class="itemPrice">
+						本体&nbsp;<span class="itemPrice"><?php echo number_format($this->escape($base_price)); ?></span>円&nbsp;
+						<span class="small">税込</span>&nbsp;<span class="itemPrice-small"><?php echo number_format($this->escape($intax_price),$this->number_of_digits); ?></span><span class="small">円</span>&nbsp;
+						<span class="small zeikomi"><?php echo $this->escape($tax_disp); ?></span>
+						</p>
+<?php } ?>
+<?php if($medicine_display_flg): ?>
+						<p class="itemAnnounce"></p>
+						<div class="medicineDetailBox">
+							<div class="medicine-explanation-cmpn">
+								<?php echo $this->medicine_data_info['explanation']; ?>
+							</div>
+							<div class="medicine-prohibition medicine-contents-detail">
+								<?php echo $this->medicine_data_info['prohibition'] ?>
+							</div>
+						<!--//medicineDetailBox--></div>
+						<div class="medicineAttentionInquiry">
+							<div class="medicine-inquiry">
+								<div class="medicine-maker medicine-contents-detail">
+									<div class="medicine-detail-title">＜製造販売元：問い合わせ先＞</div>
+						            <div class="medicine-detail-data">
+										<div class="medicine-detail-subdata"><?php echo $this->medicine_data_info['maker_info'] ?></div>
+									</div>
+								</div>
+								<div class="madicine-shop-inquiry medicine-contents-detail">
+									<div class="medicine-detail-title">＜店舗：問い合わせ先＞</div>
+						            <div class="medicine-detail-data">
+										<div class="medicineShopName"><?php echo $this->escape($this->medicine_shop_inquiry['shop_officiall_name']); ?></div>
+										<div class="medicineDetailSubdata">
+											<table>
+												<tbody>
+													<tr><td class="medicineDetailSubdataTitle">●所在地</td></tr>
+													<tr><td><?php echo $this->escape($this->medicine_shop_inquiry['shop_address']); ?></td></tr>
+												</tbody>
+											</table>
+											<table cols=2>
+												<tbody>
+													<tr>
+														<td class="medicineDetailSubdataTitle" colspan="2">●相談窓口及び緊急連絡先</td>
+													</tr>
+													<tr>
+														<td class="headword" colspan="2">
+															<?php echo $this->escape($this->medicine_shop_inquiry['shop_officiall_name']); ?>
+														</td>
+													</tr>
+													<tr>
+														<td class="headword">受付時間</td>
+														<td><?php echo $this->escape($this->medicine_shop_inquiry['shop_conference_time_text']); ?></td>
+													</tr>
+	<?php if(isset($this->medicine_shop_inquiry['shop_conference_tell']) && strlen($this->medicine_shop_inquiry['shop_conference_tell']) > 0): ?>
+													<tr>
+														<td  class="headword">電話番号</td>
+														<td><?php echo $this->escape($this->medicine_shop_inquiry['shop_conference_tell']); ?></td>
+													</tr>
+	<?php endif; ?>
+	<?php if(isset($this->medicine_shop_inquiry['shop_conference_fax']) && strlen($this->medicine_shop_inquiry['shop_conference_fax']) > 0): ?>
+													<tr>
+														<td  class="headword">FAX</td>
+														<td><?php echo $this->escape($this->medicine_shop_inquiry['shop_conference_fax']); ?></td>
+													</tr>
+	<?php endif; ?>
+	<?php if(isset($this->medicine_shop_inquiry['shop_conference_mail']) && strlen($this->medicine_shop_inquiry['shop_conference_mail']) > 0): ?>
+													<tr>
+														<td  class="headword">メール</td>
+														<td><?php echo $this->escape($this->medicine_shop_inquiry['shop_conference_mail']); ?></td>
+													</tr>
+	<?php endif; ?>
+	<?php if ($this->medicine_shop_inquiry['shop_conference_free_text']): ?>
+													<tr>
+														<td class="headword" colspan="2">
+															<?php echo $this->escape($this->medicine_shop_inquiry['shop_conference_free_text']); ?>
+														</td>
+													</tr>
+	<?php endif; ?>
+													<tr>
+														<td class="medicineDetailSubdataTitle" colspan="2">●時間外相談窓口</td>
+													</tr>
+	<?php if(isset($this->medicine_shop_inquiry['shop_conference_overtime_tell']) && strlen($this->medicine_shop_inquiry['shop_conference_overtime_tell']) > 0): ?>
+													<tr>
+														<td  class="headword">電話番号</td>
+														<td><?php echo $this->escape($this->medicine_shop_inquiry['shop_conference_overtime_tell']); ?></td>
+													</tr>
+	<?php endif; ?>
+	<?php if(isset($this->medicine_shop_inquiry['shop_conference_overtime_fax']) && strlen($this->medicine_shop_inquiry['shop_conference_overtime_fax']) > 0): ?>
+													<tr>
+														<td  class="headword">FAX</td>
+														<td><?php echo $this->escape($this->medicine_shop_inquiry['shop_conference_overtime_fax']); ?></td>
+													</tr>
+	<?php endif; ?>
+	<?php if(isset($this->medicine_shop_inquiry['shop_conference_overtime_mail']) && strlen($this->medicine_shop_inquiry['shop_conference_overtime_mail']) > 0): ?>
+													<tr>
+														<td  class="headword">メール</td>
+														<td><?php echo $this->escape($this->medicine_shop_inquiry['shop_conference_overtime_mail']); ?></td>
+													</tr>
+	<?php endif; ?>
+												</tbody>
+											</table>
+										</div>
+									</div>
+								</div>
+							<!--//medicine-inquiry--></div>
+						<!--//medicineAttentionInquiry--></div>
+<?php endif; ?>
+					</div>
+				</div>
+			<!--//Box--></div>
+
+<div class="Box" id="searchItem">
+	<div class="searchItemBox">
+		<form id="searchItemForm" action="<?php echo $this->escape($this->top_page); ?>shop/<?php echo $this->escape($this->shop_code); ?>/cmpn_item_lst.php" method="post">
+		<input type="hidden" name="evid" value="<?php echo $this->escape($this->campaign_event_data['event_id']); ?>" />
+		<div class="searchItemFormBox">
+			<div class="label"><p>商品検索</p></div>
+			<div class="form">
+				<div class="textBox"><input type="text" value="" name="p_dtl_srh_wd" class="itemName" results="10" placeholder="商品名を入力" /></div>
+				<div class="submitBox"><input class="button button1" type="submit" value="検索" name="p_dtl_srh_btn" /></div>
+			</div>
+		</div>
+		</form>
+	</div>
+<!--//Box--></div>
+
+<div class="Box">
+
+
+
+<div class="submitBox">
+<p><a href="cmpn_item_lst.php?evid=<?php echo $this->escape($this->campaign_event_data['event_id']); ?>&mode=back#d_<?php echo $this->escape($this->item_data_info['item_code']); ?>" class="button buttonBack"><?php echo $this->str_cmpn_label; ?>一覧へ戻る</a></p></div>
+</div>
+
+		</article>
+<?php echo $this->render('_parts/footer/footer.html'); /* フッター */ ?>
+	<!--wrap--></div>
+<?php echo $this->render('_parts/footer/analytics.html'); /* Google Analytics */ ?>
+</body>
+</html>

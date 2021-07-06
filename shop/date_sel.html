@@ -1,0 +1,404 @@
+<?php
+/**
+ * 店舗受取便の出力順を変更する（全便のうちに配達便と店舗受取便が存在するかの判定、最大のdate_id(配達便、店舗受取便ごと)の取得も行う）
+ *
+ * @author Kenji Yamamoto
+ * @since 2015/04/10
+ *
+ * @param boolean $today_end_flg	当日の全便受付終了フラグ
+ * @param array $delivery_num_list	配達時間帯表
+ * @param boolean &$_mixed_standard_and_shop_receive_flg	配達便と店舗受取便が存在するフラグ
+ * @param array &$_max_date_id	最大のdate_id(配達便、店舗受取便ごと)
+ * @return array 配達時間帯表
+ */
+if (!function_exists('_change_output_order_for_shop_receive')) {
+function _change_output_order_for_shop_receive($today_end_flg, $delivery_num_list, &$_mixed_standard_and_shop_receive_flg, &$_max_date_id) {
+	$_mixed_standard_and_shop_receive_flg = false;
+	$_exist_standard = false;
+	$_exist_shop_receive = false;
+	$_max_date_id = array(
+		'standard' => -1,		//配達便
+		'shopReceive' => -1,	//店舗受取便
+	);
+
+	//配達便（通常便）のリスト
+	$_standard_delivery_list = array(
+		'closed' => array(),	//受付終了
+		'open' => array(),		//受付中
+	);
+	//店舗受取便のリスト
+	$_shop_receive_list = $_standard_delivery_list;
+
+	foreach ($delivery_num_list[0] as $val) {
+		if($today_end_flg == true && $val['date_id'] == 0) {
+			$_delivery_status = 'closed';
+		} else {
+			$_delivery_status = 'open';
+		}
+
+		//店舗受取便のとき
+		if(isset($val['shop_receive_flg']) && $val['shop_receive_flg']==1) {
+			$_exist_shop_receive = true;
+			$_shop_receive_list[$_delivery_status][] = $val;
+			if($_max_date_id['shopReceive'] < $val['date_id']) {
+				$_max_date_id['shopReceive'] = $val['date_id'];
+			}
+		} else {
+			$_exist_standard = true;
+			$_standard_delivery_list[$_delivery_status][] = $val;
+			if($_max_date_id['standard'] < $val['date_id']) {
+				$_max_date_id['standard'] = $val['date_id'];
+			}
+		}
+	}
+
+	//配達便と店舗受取便が存在するとき
+	if($_exist_standard && $_exist_shop_receive) {
+		$_mixed_standard_and_shop_receive_flg = true;
+	}
+
+	return array(
+		array_merge(
+			$_standard_delivery_list['closed'],
+			$_shop_receive_list['closed'],
+			$_standard_delivery_list['open'],
+			$_shop_receive_list['open']
+		),
+		$delivery_num_list[1]
+	);
+}
+}
+
+/**
+ * 便の情報を得る
+ *
+ * @author Kenji Yamamoto
+ * @since 2015/04/13
+ *
+ * @param array $val	配達時間帯表
+ * @param array $_max_date_id	最大のdate_id(配達便、店舗受取便ごと)
+ * @param boolean $_shop_receive	現在の便が店舗受取便であるフラグ
+ * @param array $_delivery_info	便の情報
+ * @return array	便の情報
+ */
+if (!function_exists('_getDeliveryInfo')) {
+function _getDeliveryInfo($val, $_max_date_id, $_shop_receive) {
+	//便の情報(テンプレート)
+	$_delivery_info_template = array(
+		'standard' => array(
+			'id' => 'boxStandardDeliveryDate',
+			'label' => '配達便',
+		),
+		'shopReceive' => array(
+			'id' => 'boxShopReceiveDate',
+			'label' => '店舗受取便',
+		),
+	);
+
+	//便の情報
+	$_delivery_info = array(
+		'current' => array(
+			'id' => null,
+			'label' => null,
+		),
+		'jumpTo' => array(
+			'id' => null,
+			'label' => null,
+		),
+	);
+
+	if ($_shop_receive) {
+		$_current = 'shopReceive';
+		$_jumpTo = 'standard';
+	} else {
+		$_current = 'standard';
+		$_jumpTo = 'shopReceive';
+	}
+
+	$_delivery_info['current'] = array(
+		'id' => $_delivery_info_template[$_current]['id'].$val['date_id'],
+		'label' => $_delivery_info_template[$_current]['label'],
+	);
+	$_date_id_jumpTo = (($val['date_id'] > $_max_date_id[$_jumpTo]) ? $_max_date_id[$_jumpTo] : $val['date_id']); //リンク先が存在しない場合の対応
+	$_delivery_info['jumpTo'] = array(
+		'id' => $_delivery_info_template[$_jumpTo]['id'].$_date_id_jumpTo,
+		'label' => $_delivery_info_template[$_jumpTo]['label'],
+	);
+
+	return $_delivery_info;
+}
+}
+?>
+<!DOCTYPE>
+<html lang="ja">
+<head>
+<?php echo $this->render('_parts/header.html'); /* ヘッダーファイル追加   */ ?>
+<script src="<?php echo $this->escape($this->common_url); ?>n_js/item_category_list.js"></script>
+<script src="<?php echo $this->escape($this->common_url); ?>f_js/input_check.js"></script>
+<!--<script type="text/javascript" src="<?php echo $this->escape($this->common_url); ?>f_js/jquery-1.8.3.min.js"></script>-->
+<script src="<?php echo $this->escape($this->common_url); ?>f_js/jquery.stickem.js"></script>
+<script>
+<!--
+function input_check(fm){
+	if(!totalCheck(fm.delivery, '<?php echo $this->escape($this->str_delivery); ?>時間帯', true, false, false, false, false) ){
+		return false;
+	}
+	return true;
+}
+function frm_submit(delivery_str, shop_receive_flg){
+	if(shop_receive_flg == 1){
+		var result = window.confirm('受取便が選択されています。OKを押すと入店します。');
+		if(!result){
+			return false;
+		}
+	}
+	var fm = document.inputform;
+	fm.delivery.value = delivery_str;
+	if(!checkNull(fm.delivery,'<?php echo $this->escape($this->str_delivery); ?>時間帯')){
+		return false;
+	}
+	fm.submit();
+}
+
+var width = 0;
+function setWidth(){
+	if(width == 0){
+		width = $('.dateSelectList:last').width();
+	}
+	$('.stickem').each(function(){
+		$(this).width(width);
+	});
+	$('.stickem-end').each(function(){
+		$(this).width(width);
+	});
+}
+function reset(){
+	$('.container').reset();
+	$('.container').stickem();
+}
+$(document).ready(function() {
+	$('.container').stickem();
+	$(window).on("orientationchange",function(){
+		width = 0;
+		setWidth();
+		reset();
+	});
+	$(window).scroll(function() {
+		setWidth();
+	});
+	$(window).resize(function() {
+		width = 0;
+		setWidth();
+		reset();
+	});
+});
+-->
+</script>
+</head>
+<body>
+<?php echo $this->render('_parts/contents_top.html') /* コンテンツトップ   */ ?>
+	<main>
+<?php $this->render('_parts/modules/emergencyBox.html'); /* 緊急ニュース */ ?>
+<?php $this->render('_parts/modules/shopTopSlider.html'); /* スライダー */ ?>
+<?php
+if ($this->isLogin) {
+	if ($this->disp_welcome) {
+?>
+		<div class="mg-width4 text-center text-size16 font-bold"><?php echo $this->escape($this->member_data['name1'].' '.$this->member_data['name2']); ?> 様 ありがとうございます</div>
+<?php $this->banner_type=10; ?>
+<?php $this->render('_parts/modules/flickableBanner.html'); ?>
+<?php
+	}
+}
+?>
+<?php $this->render('_parts/modules/SamplaSurvey.html') /* サンプルプラットフォームアンケート回答 */ ?>
+<?php $this->render('_parts/modules/campaignListBox.html');?>
+
+		<hr class="h-3 border-0">
+		<div class="bg-color2 org-border1 rounded m-4">
+			<div class="flex items-center p-2">
+				<div>
+					<img class="w-20" src="<?php echo $this->escape($this->img_url); ?>common/house.png">
+				</div>
+				<div class="ml-3 mr-5">お届け先</div>
+				<span class="tx-color-link  text-size12"><a href="<?php echo $this->escape($this->top_page); ?>mypage/delivery/address_chg.php">変更</a></span>
+			</div>
+			<div class="m-2"><?php echo $this->escape($this->member_data['address1'].$this->member_data['address2'].$this->member_data['address3']); ?></div>
+		</div>
+<?php if(empty($this->user_purchase_flg)){ ?>
+		<div class="mt-10 text-center text-size16">
+			<label><b>ご希望の便をご選択ください</b></label>
+		</div>
+		<div class="mg-width11 text-center text-size16">
+			<br />
+			<p class=" text-size16" ><span style="color : red;font-weight: bold;">買い物代行専用エリアです。</span></p>
+			<br />
+		</div>
+<?php }else{ ?>
+
+<?php
+
+if ($this->delivery_num_list[1] > 0):
+	//店舗受取便の出力順を変更する（全便のうちに配達便と店舗受取便が存在するかの判定、最大のdate_id(配達便、店舗受取便ごと)の取得も行う）
+	$_delivery_num_list	= _change_output_order_for_shop_receive($this->today_end_flg, $this->delivery_num_list, $_mixed_standard_and_shop_receive_flg, $_max_date_id);
+
+	// 配達時間帯データの一番初めが配達便の場合は配達時間帯の見出しを出力するが、
+	// そうでない場合は店舗受取時間帯の見出しを出力する
+	if ($_delivery_num_list[0][0]['shop_receive_flg'] == 0) {
+?>
+		<div class="mt-10 text-center text-size16">
+			<label><b>ご希望の便をご選択ください</b></label>
+<?php } else { ?>
+		<div class="mt-10 text-center text-size16">
+			<label><b>ご希望の店舗・便をご選択ください</b></label>
+<?php } ?>
+<?php /* if($this->today_end_flg == true && ($this->order_data[$this->sess_corp_admin_flg] != 1 || ( isset($this->delivery_num_list[0]['date_id']) && $this->delivery_num_list[0]['date_id'] == 0 ) )):		//当日が既に締め切られている場合?>
+			<div class="bin-select1 mg-width11">
+				<div id="bin-select1-1"></div>
+				<div id="bin-select1-2"><span><?php echo $this->escape($this->today_name); ?>&nbsp;全便受付終了</span>&nbsp;&nbsp;<span><a href="#" class="text-size10 underline" title="開く" onclick="showPlagin('Date0');return false;">開く</a></span></p>
+			</div>
+<?php endif; */ ?>
+		</div>
+
+<?php
+		$deliver_closed_header_shop_receive = false;	// 当日の全便受付終了の店舗受取便のヘッダー出力済フラグ
+		$tmp_date_id = null;	// date_idの退避場所
+		$enable_delivery = false;	// 受付できない表示をしたらtrue(日付が変わればリセット)
+		$disp_list = false;	// 1日でも表が出ればtrue
+		$tmp_shop_receive_flg = null;	// shop_receive_flgの退避場所
+		foreach ($_delivery_num_list[0] as $key => $val) {
+			if (isset($val['shop_receive_flg']) && $val['shop_receive_flg']==1) {
+				$_shop_receive = true;	//現在の便が店舗受取便であるフラグ ON
+			} else {
+				$_shop_receive = false;	//現在の便が店舗受取便であるフラグ OFF 
+			}
+
+			//便の情報を得る
+			$_delivery_info = _getDeliveryInfo($val, $_max_date_id, $_shop_receive);
+
+			//現在、全便受付終了部であるフラグ
+			$_current_is_today_end_part = false;
+			if ($this->today_end_flg == true && $val['date_id'] == 0) {
+				$_current_is_today_end_part = true;
+			}
+
+			//便のカラムヘッダーを出力するフラグ
+			$output_delivery_date_header = false;
+
+			// 「日付が変わった」か、「現在、全便受付終了部でなくて、店舗受取便に変わった」かであれば日付の表示
+			if (($tmp_date_id != $val['date_id']) || (!$_current_is_today_end_part && ($tmp_shop_receive_flg != $val['shop_receive_flg']))) {
+				if (!isset($val['enable_delivery_week']) || $val['enable_delivery_week'] === true) {
+					if (!is_null($tmp_date_id)) {
+						echo '						</div>'."\n";
+					}
+				}
+				$tmp_date_id = $val['date_id'];
+				// 配達便から店舗受取便に変わるタイミングで「店舗受取時間帯の選択」の見出しを出力
+				// 配達時間帯データに配達便が無い場合は既に出力済みなので出力しない
+				if ($tmp_shop_receive_flg <> NULL && isset($val['shop_receive_flg']) && $tmp_shop_receive_flg != $val['shop_receive_flg']) {
+?>
+		<div class="bd-color-gray mt-10"></div>
+		<div class="mt-10 text-center text-size16">
+			<label><b>ご希望の店舗・便をご選択ください</b></label>
+		</div>
+<?php
+				}
+				$tmp_shop_receive_flg = $val['shop_receive_flg'];
+				$enable_delivery = false;
+
+				if (!isset($val['enable_delivery_week']) || $val['enable_delivery_week'] === true) {
+					$disp_list = true;
+?>
+<?php if($this->today_end_flg == true && $val['date_id'] == 0):		//当日が既に締め切られている場合?>
+		<div id="boxOpenDate0" class="bg-color6 m-2 p-3 mb-8 rounded-lg">
+			<b><?php echo $this->escape($this->today_name); ?>&nbsp;全便受付終了</b>&nbsp;&nbsp;<a href="#" class="text-size10 underline" title="開く" onclick="showPlagin('Date0');return false;">開く</a>
+		</div>
+
+<?php endif; ?>
+<?php if($this->today_end_flg == true && $val['date_id'] == 0):		//当日が既に締め切られている場合?>
+		<div id="boxCloseDate0" class="bg-color6 m-2 p-3 mb-8 rounded-lg" style="display: none;">
+			<b><?php echo $this->escape($val['date_name']); ?>&nbsp;全便受付終了</b>&nbsp;&nbsp;<a href="#" class="text-size10 underline" title="閉じる" onclick="showPlagin('Date0');return false;">閉じる</a>
+<?php else: ?>
+		<div id="<?php echo $this->escape($_delivery_info['current']['id']); ?>" class="text-center">
+			<div class="m-3 mt-10 mb-0 text-left">
+				<b><?php echo $this->escape($val['date_name']); ?></b>
+<?php				if($_mixed_standard_and_shop_receive_flg) { //全便のうちに 配達便と店舗受取便が存在する場合?>
+									&nbsp;<?php echo $this->escape($_delivery_info['current']['label']); ?>
+<?php					if(!($this->today_end_flg && (($_max_date_id['standard'] == 0) || ($_max_date_id['shopReceive'] == 0)))) { //全便受付終了でリンク先が無くなってしまう場合の対応 ?>
+									<a class="mt-2" style="float: right" href="#<?php echo $this->escape($_delivery_info['jumpTo']['id']); ?>" onclick="reset();">
+										<span class="tx-color-link text-size12"><?php echo $this->escape($_delivery_info['jumpTo']['label']); ?>へ</span>
+									</a>
+<?php					} ?>
+<?php				} ?>
+			</div>
+<?php endif; ?>
+<?php
+					//便のカラムヘッダーを出力するフラグ ON
+					$output_delivery_date_header = true;
+				}
+			} ?>
+<?php
+			if ($disp_list) {
+				//現在、全便受付終了部で、全便受付終了の店舗受取便のヘッダーが出力済でなくて、出力対象が店舗受取便の時
+				if($_current_is_today_end_part && !$deliver_closed_header_shop_receive && (isset($val['shop_receive_flg']) && $val['shop_receive_flg']==1)) {
+					//便のカラムヘッダーを出力するフラグ ON
+					$output_delivery_date_header = true;
+					// 全便受付終了の店舗受取便のヘッダー出力済フラグ ON
+					$deliver_closed_header_shop_receive = true;
+				}
+			}
+			if ($enable_delivery == true) continue;	// 同日に受付できない表示が複数回出るので抜ける
+			if (isset($val['enable_delivery_week']) && $val['enable_delivery_week'] === false && $enable_delivery === false) {
+				$enable_delivery = true;
+			} else {
+?>
+<?php 			if ($val['chk_can_order'] == 'ok' || $val['chk_can_order'] == 'little' ) {  //注文可 ?>
+			<a href="javascript:frm_submit('<?php echo $this->escape($val['date_id'].'-'.$val['delivery_id']); ?>', <?php echo (isset($val['shop_receive_flg']) && $val['shop_receive_flg']==1)?1:0; ?>); void(0);">
+<?php	 		} ?>
+				<div class="<?php echo $this->escape($val['can_order_style']['style_name']); ?>">
+					<!-- div class="label"><p><strong><?php echo $this->escape($val['delivery_name']) ?></strong></p></div> -->
+					<div class="<?php echo $this->escape($val['can_order_style']['label_name']); ?>">
+						<div class="<?php echo $this->escape($val['can_order_style']['description_name']); ?>">
+							<img class="w-30" src="<?php echo $this->escape($val['can_order_style']['status_str']) ?>" >
+						</div>
+						<div class="description-sub">
+							<p class="bin-text">
+<?php			if ($_shop_receive) { ?>
+					<?php echo $this->escape($val['delivery_name']) ?>
+<?php			} ?>
+					<?php echo $this->escape($val['delivery_time']) ?>
+<?php if ($this->order_data[$this->sess_corp_admin_flg] != 1) { ?>
+								<br /><nobr>（<?php echo $this->escape($val['order_start_date'].' '.$val['order_start_time'].' 〜 '.$val['order_end_date'].' '.$val['order_end_time']) ?>〆）</nobr>
+<?php } ?>
+							</p>
+						</div>
+					</div>
+				</div>
+<?php 			if ($val['chk_can_order'] == 'ok' || $val['chk_can_order'] == 'little' ) {  //注文可 ?>
+			</a>
+<?php
+				}
+			}
+		} //end foreach
+		if ($disp_list == false) {
+?>
+			<div class="mg-width11 text-center">
+				<label>受付可能な日がありませんでした。後日またお越しください。</label>
+			</div>
+<?php 	} ?>
+			<form name="inputform" method="post" action="<?php echo $this->escape($this->top_page); ?>shop/<?php echo $this->escape($this->area_shop[0]['shop_code']); ?>/date_chg.php" class="defaultform">
+				<input type="hidden" name="rtn" value="<?php echo $this->escape($this->rtn); ?>" />
+				<input type="hidden" name="delivery" value="" />
+			</form>
+<?php endif; ?>
+		</div>
+<?php $this->render('_parts/modules/conveniHowtouseBox.html'); ?>
+<?php $this->render('_parts/modules/aboutShopDataBox.html'); ?>
+<?php $this->render('_parts/modules/aboutManifest.html'); /* 医薬品販売適合証 */ ?>
+<?php $this->render('_parts/modules/deliveryPriceBox.html'); ?>
+<?php } ?>
+	</main>
+<?php echo $this->render('_parts/footer/footer.html') /* フッター */ ?>
+<?php echo $this->render('_parts/footer/analytics.html') /* Google Analytics */ ?>
+</body>
+</html>

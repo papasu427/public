@@ -1,0 +1,13 @@
+<?php if($this->service_category_list[1] > 0): ?>
+					<nav class="Box" id="guideMenu">
+						<h2 class="title">サービス概要</h2>
+						<div class="guideMenuBox">
+							<ul class="guideMenuList">
+								<li><a href="<?php echo $this->escape($this->top_page); ?>outline/area.php"><div class="menuTitle"><?php echo $this->escape($this->str_delivery); ?>エリアについて</div></a></li>
+	<?php foreach($this->service_category_list[0] as $key => $val): ?>
+								<li><a href="<?php echo $this->escape($this->top_page); ?>outline/contents_lst.php?category_id=<?php echo $this->escape($val['category_id']); ?>"><div class="menuTitle"><?php echo $this->escape($val['category_title']); ?></div></a></li>
+	<?php endforeach; ?>
+							</ul>
+						</div>
+					<!--nav--></nav>
+<?php endif; ?>

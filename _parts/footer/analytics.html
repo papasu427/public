@@ -1,0 +1,69 @@
+<div class="analytics">
+<?php
+if (//ユニバーサル アナリティクスのバージョンで複数トラッキングIDの書き方が異なるので、別で対応する
+isset($this->ga_code1) && $this->ga_code1 != '' && isset($this->ga_ver_flg1) && $this->ga_ver_flg1 == 1 &&
+isset($this->ga_code2) && $this->ga_code2 != '' && isset($this->ga_ver_flg2) && $this->ga_ver_flg2 == 1
+){?>
+	<script>
+		(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+			(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+			m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+			})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+		ga('create', '<?php echo $this->escape($this->ga_code1); ?>', 'auto');
+		ga('send', 'pageview');
+		ga('create', '<?php echo $this->escape($this->ga_code2); ?>', 'auto', {'name': 't1'});
+		ga('t1.send', 'pageview');
+	</script>
+<?php
+}else if ((isset($this->ga_code1) && $this->ga_code1 != '')
+	|| (isset($this->ga_code2) && $this->ga_code2 != '')) {
+?>
+<?php if (isset($this->ga_code1) && $this->ga_code1 != '') {?>
+	<?php if (isset($this->ga_ver_flg1) && $this->ga_ver_flg1 == 0){ ?>
+		<script type="text/javascript">
+			var _gaq = _gaq || [];
+			_gaq.push(['_setAccount', '<?php echo $this->escape($this->ga_code1); ?>']);
+			_gaq.push(['_trackPageview']);
+
+			(function() {
+				var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+				ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+				var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+			})();
+		</script>
+	<?php } elseif (isset($this->ga_ver_flg1) && $this->ga_ver_flg1 == 1){ ?>
+		<script>
+			(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+				(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+				m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+				})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+			ga('create', '<?php echo $this->escape($this->ga_code1); ?>', 'auto');
+			ga('send', 'pageview');
+		</script>
+	<?php } ?>
+<?php } ?>
+<?php if (isset($this->ga_code2) && $this->ga_code2 != '') {?>
+	<?php if (isset($this->ga_ver_flg2) && $this->ga_ver_flg2 == 0){ ?>
+		<script type="text/javascript">
+			var _gaq = _gaq || [];
+			_gaq.push(['_setAccount', '<?php echo $this->escape($this->ga_code2); ?>']);
+			_gaq.push(['_trackPageview']);
+			(function() {
+				var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+				ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+				var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+			})();
+		</script>
+	<?php } elseif (isset($this->ga_ver_flg2) && $this->ga_ver_flg2 == 1){ ?>
+		<script>
+			(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+				(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+				m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+				})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+			ga('create', '<?php echo $this->escape($this->ga_code2); ?>', 'auto');
+			ga('send', 'pageview');
+		</script>
+	<?php } ?>
+<?php } ?>
+<?php } ?>
+</div>

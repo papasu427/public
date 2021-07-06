@@ -1,0 +1,51 @@
+<?php
+/************************************/
+/* id_val変数に商品データを入れておく
+/************************************/
+// 「店内見学でない」場合のみお気に入り状態アイコンの表示
+$_js_arg="";
+if ( $this->isLogin && ! $this->tour_flg ) {
+	//引数1 商品コード
+	$_js_arg = "'".$this->escape($id_val['item_code'])."'";
+
+	//引数2 商品名
+	$_js_arg .= ",'".$this->escape($id_val['full_item_name'])."'";
+
+	//引数3 販売企画ID
+	if (isset($id_val['event_id'])) {
+		$_js_arg .= ",'".$this->escape($id_val['event_id'])."'";
+	} else {
+		$_js_arg .= ",''";
+	}
+
+	//引数4 カテゴリコード
+	if (isset($id_val['category_code'])) {
+		$_js_arg .= ",'".$this->escape($id_val['category_code'])."'";
+	} else {
+		$_js_arg .= ",''";
+	}
+
+	//引数5 お気に入りモードは個別にhtmlの中で設定
+	$_js_arg .= ",";
+}
+?>
+<!-- お気に入り -->
+<div id="favBox_<?php echo $this->escape($id_val['item_code']); ?>" class="absolute right-0 top-0">
+	<?php if ($id_val['favorite'] == false) { ?>
+		<?php //お気に入り設定なし ?>
+		<a onclick="JavaScript:setFavorite(<?php echo $this->escape($_js_arg."'".'list'."'"); ?>);" id="favorite_off_<?php echo $this->escape($id_val['item_code']); ?>">
+			<img id="btn_favorite" class="pic-size5 align-top" src="<?php echo $this->escape($this->img_url); ?>common/hartOff.png">
+		</a>
+		<a onclick="JavaScript:delFavorite(<?php echo $this->escape($_js_arg."'".'delete'."'"); ?>);" id="favorite_on_<?php echo $this->escape($id_val['item_code']); ?>" class="hidden">
+			<img id="btn_favorite" class="pic-size5 align-top" src="<?php echo $this->escape($this->img_url); ?>common/hartOn.png">
+		</a>
+	<?php } else { ?>
+		<?php //お気に入り設定あり ?>
+		<a onclick="JavaScript:setFavorite(<?php echo $this->escape($_js_arg."'".'list'."'"); ?>);"  id="favorite_off_<?php echo $this->escape($id_val['item_code']); ?>" class="hidden">
+			<img id="btn_favorite" class="inline-block pic-size5 align-top" src="<?php echo $this->escape($this->img_url); ?>common/hartOff.png">
+		</a>
+		<a onclick="JavaScript:delFavorite(<?php echo $this->escape($_js_arg."'".'delete'."'"); ?>);" id="favorite_on_<?php echo $this->escape($id_val['item_code']); ?>">
+			<img id="btn_favorite" class="inline-block pic-size5 align-top" src="<?php echo $this->escape($this->img_url); ?>common/hartOn.png">
+		</a>
+	<?php } ?>
+</div>

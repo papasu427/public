@@ -1,0 +1,26 @@
+<?php if($this->set_survey_list): ?>
+			<div class="m-1 border-b pb-2 my-10pt">
+				<b class="text-size16">アンケート</b>
+					<div class="bg-color3 rounded">
+<?php 	foreach($this->set_survey_list as $basic_key => $basic_val): ?>
+						<div class="mx-10px table">
+							<p><?php echo $this->escape($basic_val['survey_name']); ?></p>
+							<hr class="h-4 border-0">
+<?php foreach($basic_val['question_list'] as $ques_key => $ques_val): ?>
+							<div class="entryEditList">
+								<div class="list">
+									<div class="label"><p><?php echo $this->escape($ques_val['question_title']); ?></p></div>
+<?php foreach($ques_val['answer_text'] as $ans_key => $ans_val): ?>
+									<div class="mx-10px my-3"><p><?php echo $this->escape($ans_val); ?></p></div>
+<?php endforeach; ?>
+<?php if(isset($ques_val['answer_free']) && strlen($ques_val['answer_free']) ): ?>
+									<div class="mx-10px"><p>【その他】<?php echo $this->escape($ques_val['answer_free']); ?></p></div>
+<?php endif; ?>
+								</div>
+							</div>
+<?php endforeach; ?>
+						</div>
+<?php endforeach; ?>
+					</div>
+			</div>
+<?php endif; ?>

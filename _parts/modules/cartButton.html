@@ -1,0 +1,172 @@
+<?php
+/************************************/
+/* id_val変数に商品データを入れておく
+/************************************/
+
+// 追加注文モードの時はレジへボタンの送信先を変更
+if ( ! $this->add_item_mode ) {
+	$order_edt = 'order_edt.php';
+} else {
+	$order_edt = 'add_order_edt.php';
+}
+// JavaScript関数に渡す引数部分の文字列をあらかじめ作っておく
+//①商品コード
+$_js_arg = "'".$this->escape($id_val['item_code'])."'";
+
+//②商品名
+if($medicine_display_flg) {
+} else {
+	$_js_arg .= ",'".$this->escape($id_val['full_item_name'])."'";
+}
+
+//③ 販売企画ID
+if (isset($id_val['event_id'])) {
+	$_js_arg .= ",'".$this->escape($id_val['event_id'])."'";
+} else {
+	$_js_arg .= ",''";
+}
+
+//④カテゴリコード
+if (isset($id_val['category_code'])) {
+	$_js_arg .= ",'".$this->escape($id_val['category_code'])."'";
+} else {
+	$_js_arg .= ",''";
+}
+
+//カートの数量を取得する
+$p_item_cart_count = 0;
+if ($id_val['in_cart'] && isset($this->side_cart_item['data'])) {
+	$search_key = array_search($id_val['item_code'], array_column($this->side_cart_item['data'], 'item_code'));
+	if (isset($search_key) && isset($this->side_cart_item['data'][$search_key])) {
+		$p_item_cart_count = $this->side_cart_item['data'][$search_key]['number'];
+	}
+}
+
+//⑤モード
+// ボタンの切り替えと追加注文モードの場合の引数追加
+if (isset($this->add_item_mode) && $this->add_item_mode == false) {
+	// 通常モード
+	$cart_btn = '				カートに追加'."\n";
+} else {
+	// 追加注文モード
+	$cart_btn = '				追加注文'."\n";
+	$_js_arg .= ",'add'";
+}
+
+// 「数量セレクトとカゴへボタン」または購入不可アイコンの表示
+// 店内見学中の場合、購入できない（ボタンなし）
+if ($this->tour_flg) {
+
+// 法人管理者専用商品で、法人管理者以外に表示する場合、購入できない
+} else if (isset($id_val['corp_admin_disp_flg']) && $id_val['corp_admin_disp_flg'] == 1 && empty($this->corp_admin_flg)) {
+?>
+		<div class="table-row"><p class="mark mark1">取扱っておりません</p></div>
+
+<?php
+// お気に入り表示で、商品を取り扱っていない場合、購入できない
+} else if (isset($id_val['item_exists']) && $id_val['item_exists'] == false && $this->disp_mode == 'fvrt') {
+?>
+		<div class="table-row"><p class="mark mark1">取扱っておりません</p></div>
+
+<?php
+// 品切れ中の場合、購入できない
+} else if ($id_val['stockout']) {
+?>
+		<div class="table-row"><p class="mark mark1">品切れ中</p></div>
+
+<?php
+// カートに入っている場合、数量ボックスを表示する
+} else if ($id_val['in_cart']) {
+?>
+		<div id="itemBox_<?php echo $this->escape($id_val['item_code']) ?>" class="mt-3 m-auto">
+			<input type="hidden" id="p_item_num" name="p_item_num_<?php echo $this->escape($id_val['item_code']); ?>" value="<?php echo $p_item_cart_count ?>" />
+			<div id="cart_add_num_<?php echo $this->escape($id_val['item_code']) ?>" class="mt-3">
+				<div  class="flex relative">
+					<div class="absolute left-0 position-top-center bg-white"> <?php //マイナスボタン ?>
+						<a onclick="JavaScript:delCart(<?php echo $this->escape($_js_arg) ?>);" class="minus-button w-40 h-20 tx-button bg-white bg-color-gray-light"></a>
+					</div>
+					<div id="cart_num" class="block text-size16 text-center tx-color-gray font-bold w-full">
+						<?php echo $p_item_cart_count ?>
+					</div>
+					<div class="absolute right-0 position-top-center bg-white"> <?php //プラスボタン ?>
+						<a onclick="JavaScript:setCart(<?php echo $this->escape($_js_arg) ?>);" class="plus-button w-40 h-20 bg-white tx-button bg-color-gray-light"></a>
+					</div>
+				</div>
+			</div>
+		</div>
+<?php 
+//カートに入っていない場合、カート追加ボタンを表示する
+} else {
+
+	// 法人管理者の場合で制限が無ければ何でも何個でも買える
+	if ($this->order_data[$this->sess_corp_admin_flg] == 1 && $this->corp_data != array() && $this->corp_data['admin_order_itemlimit_flg'] == 1) {
+?>
+		<div class="itemNum" id="itemOp_<?php echo  $this->escape($id_val['item_code']) ?>">
+			<input type="text" name="p_item_num[]" size="2" maxlength="2" value="1" style="ime-mode:disabled" class="itemNumSelect">
+		</div>
+<?php} else { ?>
+		<div class="itemNum" id="itemOp_<?php echo $this->escape($id_val['item_code']) ?>">
+			<select name="p_item_num[]" class="itemNumSelect" style="display:none">
+<?php 	foreach ($this->order_quantity as $oq_key => $oq_val) {
+			if ($oq_val <= $id_val['order_quantity']) {
+?>
+				<option value="'<?php echo $this->escape($oq_key) ?>'">'<?php echo $this->escape($oq_val) ?>'</option>
+<?php		} else {
+				break;
+			}
+		}
+?>
+			</select>
+		</div>
+<?php
+	//法人管理 -end
+	} else {
+?>
+		<div id="itemBox_<?php echo $this->escape($id_val['item_code']) ?>" class="relative mt-3 m-auto">
+			<input type="hidden" id="p_item_num"  name="p_item_num_<?php echo $this->escape($id_val['item_code']); ?>" value="0" />
+			<div id="cart_add_num_<?php echo $this->escape($id_val['item_code']) ?>" class="mt-3" style="display:none">
+				<div  class="relative">
+					<div class="absolute left-0 position-top-center bg-white"> <?php //マイナスボタン ?>
+						<a onclick="JavaScript:delCart(<?php  echo $this->escape($_js_arg) ?>);" class="minus-button w-40 h-20 tx-button bg-white bg-color-gray-light"></a>
+					</div>
+					<div id="cart_num" class="block text-size16 text-center tx-color-gray font-bold w-full h-7">
+						<?php echo $p_item_cart_count ?>
+					</div>
+					<div class="absolute right-0 position-top-center tx-button bg-white"> <?php //プラスボタン ?>
+						<a onclick="JavaScript:setCart(<?php echo $this->escape($_js_arg) ?>);" class="plus-button w-40 h-20 tx-button bg-white bg-color-gray-light"></a>
+					</div>
+				</div>
+			</div>
+
+<?php 
+		if($medicine_display_flg) {
+			if($id_val['resale_flg'] === true) {
+?>
+			<div id="cart_add_on_<?php echo $this->escape($id_val['item_code']) ?>'">
+				<a onclick="JavaScript:move_medicine_attention(<?php echo $_js_arg ?>);" class="block text-center tx-button border bg-color-gray w-full p-1_5 pl-2 pr-3">
+					<?php echo $cart_btn ?>
+				</a>
+			</div>
+<?php		} else { ?>
+			<div id="cart_add_on_<?php echo $this->escape($id_val['item_code']) ?>">
+				<a onclick="JavaScript:resaleMedicineAlert(<?php echo $id_val['resale_date'] ?>);" class="block text-center tx-color4 border bg-color-gray w-full p-1_5 pl-2 pr-3">
+					<?php echo $cart_btn ?>
+				</a>
+			</div>
+<?php
+			}
+		} else {
+?>
+			<div id="cart_add_on_<?php echo $this->escape($id_val['item_code']) ?>">
+				<a onclick="JavaScript:setCart(<?php echo $_js_arg; ?>);" class="block text-center tx-button text-size12 bd-button w-full p-1_5 pl-2 pr-3 rounded">
+					<?php echo $cart_btn ?>
+				</a>
+			</div>
+<?php 
+		}
+?>
+		</div>
+<?php
+	}
+}
+?>

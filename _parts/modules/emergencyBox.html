@@ -1,0 +1,35 @@
+<script>
+	$(function(){
+		$('.emergency-slide').slick({
+			accessibility: true,
+			autoplay: true,
+			autoplaySpeed: 3000,
+			dots: true,
+			fade: true,
+		});
+	});
+
+</script>
+
+<?php if (isset($this->emergency) && is_array($this->emergency)) { ?>
+	<div class="bd-emergency mt-4 mb-4 mx-base m-auto text-size12">
+		<div class=" flex flex-no-wrap items-center justify-center bg-emergency text-white text-center">
+			<img class="flex-row w-15 mr-1" src="<?php echo $this->escape($this->img_url); ?>icon/icon-kinkyu.png">
+			<h3 class="flex-row">緊急連絡</h3>
+		</div>
+		<div class="emergency-slide">
+			<div class="ml-2 mr-2">
+				<p class="bd-b-color-gray pb-2 mb-2"><?php echo $this->escape($this->emergency['news_title']); ?></p>
+				<?php echo nl2br($this->emergency['news_naiyou']); ?>
+			</div>
+			<div class="ml-2 mr-2">
+				<p class="bd-b-color-gray pb-1 mb-2">緊急メンテナンス</p>
+				<?php echo '1/5(火) 21:00～ メンテナンスを行います。' ?>
+			</div>
+			<div class="ml-2 mr-2">
+				<p class="bd-b-color-gray pb-1 mb-2">お詫び</p>
+				<?php echo '〇〇〇〇〇〇〇〇〇〇〇〇〇' ?>
+			</div>
+		</div>
+	</div>
+<?php } ?>

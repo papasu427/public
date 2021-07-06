@@ -1,0 +1,86 @@
+<nav class="shopNaviBox">
+<div id="boxOpen97" class="bd-b-base-light">
+	<p class="text-right text-size12 tx-color6 m-3">&raquo;&nbsp;<a href="#" class="showBoxLink" title="<?php echo $this->escape($this->str_delivery_fee) ?>はこちら" onclick="showPlagin(97);return false;"><?php echo $this->escape($this->str_delivery_fee) ?>はこちら</a></p>
+</div>
+<div id="boxClose97" class="bd-b-base-light" style="display:none" >
+	<p class="text-right text-size12 tx-color6 m-3">&raquo;&nbsp;<a href="#" class="showBoxLink" title="<?php echo $this->escape($this->str_delivery_fee) ?>を閉じる" onclick="showPlagin(97);return false;"><?php echo $this->escape($this->str_delivery_fee) ?>を閉じる</a></p>
+<div class="deliveryPriceBox">
+<aside class="deliveryPriceList">
+	<div class="list header">
+		<div class="label"><p>ご注文<br />合計金額</p></div>
+		<div class="description"><p><?php echo $this->escape($this->str_delivery_fee) ?></p></div>
+	</div>
+	<div class="list">
+		<div class="label">
+			<p>0円以上<br />
+			<?php if(strlen($this->charge_data[0]['middle_cap']) > 0): ?>
+				<?php echo $this->escape(number_format($this->charge_data[0]['middle_cap'])); ?>円未満
+			<?php endif; ?>
+			</p>
+		</div>
+		<div class="description">
+			<p>
+				<?php foreach($this->charge_data as $key => $val): ?>
+					<?php echo $this->escape($val['name']) ?>
+					：<span class="price">
+						<?php if(empty($val['low_charge'])): ?>
+							<span class="price free">無料</span>
+						<?php else: ?>
+							<?php echo $this->escape($val['low_charge']) ?>円
+						<?php endif; ?>
+					</span><br />
+				<?php endforeach; ?>
+			</p>
+		</div>
+	</div>
+<?php if(strlen($this->charge_data[0]['middle_cap']) > 0): ?>
+	<div class="list">
+		<div class="label">
+			<p><?php echo $this->escape(number_format($this->charge_data[0]['middle_cap'])); ?>円以上<br />
+			<?php if(strlen($this->charge_data[0]['high_cap']) > 0): ?>
+				<?php echo $this->escape(number_format($this->charge_data[0]['high_cap'])); ?>円未満
+			<?php endif; ?>
+			</p>
+		</div>
+		<div class="description">
+			<p>
+				<?php foreach($this->charge_data as $key => $val): ?>
+					<?php echo $this->escape($val['name']) ?>
+					：<span class="price">
+						<?php if(empty($val['middle_charge'])): ?>
+							<span class="price free">無料</span>
+						<?php else: ?>
+							<?php echo $this->escape($val['middle_charge']) ?>円
+						<?php endif; ?>
+					</span><br />
+				<?php endforeach; ?>
+			</p>
+		</div>
+	</div>
+<?php endif; ?>
+<?php if(strlen($this->charge_data[0]['high_cap']) > 0): ?>
+	<div class="list">
+		<div class="label">
+			<p><?php echo $this->escape(number_format($this->charge_data[0]['high_cap'])); ?>円以上
+			</p>
+		</div>
+		<div class="description">
+			<p>
+				<?php foreach($this->charge_data as $key => $val): ?>
+					<?php echo $this->escape($val['name']) ?>
+					：<span class="price">
+						<?php if(empty($val['high_charge'])): ?>
+							<span class="price free">無料</span>
+						<?php else: ?>
+							<?php echo $this->escape($val['high_charge']) ?>円
+						<?php endif; ?>
+					</span><br />
+				<?php endforeach; ?>
+			</p>
+		</div>
+	</div>
+<?php endif; ?>
+</aside>
+</div>
+</div>
+<!--//Nav--></nav>

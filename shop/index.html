@@ -1,0 +1,81 @@
+<!DOCTYPE>
+<html lang="ja">
+<head>
+<?php echo $this->render('_parts/header.html'); /* ヘッダーファイル追加   */ ?>
+<script type="text/javascript" src="<?php echo $this->escape($this->common_url); ?>n_js/item_category_list.js"></script>
+<?php
+if ($this->tour_flg) {
+?>
+<scrip src="<?php echo $this->escape($this->common_url); ?>n_js/item_list_tour.js"></script>
+<?php
+} else {
+?>
+<script src="<?php echo $this->escape($this->common_url); ?>n_js/item_list.js"></script>
+	<?php
+	}
+?>
+<script src="<?php echo $this->escape($this->common_url); ?>n_js/jquery/jquery.colorbox.js"></script>
+<script src="<?php echo $this->escape($this->common_url); ?>n_js/jquery/jquery.growl.js"></script>
+
+<link rel="stylesheet" href="<?php echo $this->escape($this->common_url); ?>n_css/jquery.growl.css">
+</head>
+<body id="top">
+	<article id="container">
+		<?php $this->banner_type=2; ?>
+		<?php $this->render('_parts/modules/searchItemBox.html'); /* 検索ボックス */ ?>
+		<?php $this->render('_parts/modules/aboutDeliveryDate.html'); /* 配達時間ボックス */ ?>
+		<?php echo $this->render('_parts/modules/emergencyBox.html') /* 緊急ニュース */ ?>
+		<?php $this->render('_parts/side/menuShop.html') /* 店舗メニュー */ ?>
+		<?php $this->render('_parts/modules/itemCategoryBox.html'); /* カテゴリ */ ?>
+		<?php $this->render('_parts/modules/SamplaSurvey.html') /* サンプルプラットフォームアンケート回答 */ ?>
+		<?php $this->render('_parts/modules/shopTopSlider.html'); /* スライダー */ ?>
+		<?php $this->render('_parts/modules/flickableBanner.html'); ?>
+		<?php $this->render('_parts/modules/itemListCategoryImage.html'); ?>
+		<?php $this->render('_parts/modules/aboutShopDataBox.html');?>
+		<?php $this->render('_parts/modules/aboutManifest.html'); /* 医薬品販売適合証 */ ?>
+<?php
+		if ( ! $this->tour_flg ) {
+			echo '<form name="favorite_set" action="favorite_set.php" method="post">'."\n";
+			echo '	<input type="hidden" name="tkn" value="'.$this->escape($this->tkn).'" />'."\n";
+			echo '	<input type="hidden" name="p_item_code" value="" />'."\n";
+			echo '	<input type="hidden" name="p_event_id" value="" />'."\n";
+			echo '	<input type="hidden" name="p_group_code" value="" />'."\n";
+			echo '	<input type="hidden" name="p_list_file" value="'.$this->escape(basename($this->url)).'" />'."\n";
+			echo '</form>'."\n";
+			echo '<form name="favorite_del" action="favorite_set.php" method="post">'."\n";
+			echo '	<input type="hidden" name="tkn" value="'.$this->escape($this->tkn).'" />'."\n";
+			echo '	<input type="hidden" name="p_item_code" value="" />'."\n";
+			echo '	<input type="hidden" name="p_event_id" value="" />'."\n";
+			echo '	<input type="hidden" name="p_group_code" value="" />'."\n";
+			echo '	<input type="hidden" name="set" value="delete" />'."\n";
+			echo '	<input type="hidden" name="p_list_file" value="'.$this->escape(basename($this->url)).'" />'."\n";
+			echo '</form>'."\n";
+
+			//追加注文の区別はしない
+			$form_action = 'cart_set.php';
+			echo '<form name="cart_set" action="'.$this->escape($form_action).'" method="post">'."\n";
+			echo '	<input type="hidden" name="tkn" value="'.$this->escape($this->tkn).'" />'."\n";
+			echo '	<input type="hidden" name="p_item_code" value="" />'."\n";
+			echo '	<input type="hidden" name="p_campain_item" value="" />'."\n";
+			echo '	<input type="hidden" name="p_event_id" value="" />'."\n";
+			echo '	<input type="hidden" name="p_group_code" value="" />'."\n";
+			echo '	<input type="hidden" name="p_item_num" value="" />'."\n";
+			echo '	<input type="hidden" name="p_list_file" value="'.$this->escape(basename($this->url)).'" />'."\n";
+			echo '	<input type="hidden" name="p_error" value="" />'."\n";
+			echo '</form>'."\n";
+		}
+?>
+		<form name="error_list" action="<?php echo $this->escape($this->top_page.'error.php') ?>" method="post">
+			<input type="hidden" name="output_flg" value="" />
+			<input type="hidden" name="error_file" value="" />
+			<input type="hidden" name="error_line" value="" />
+			<input type="hidden" name="error_type" value="" />
+			<input type="hidden" name="error_msg" value="" />
+			<input type="hidden" name="next_file" value="" />
+			<input type="hidden" name="comment" value="" />
+		</form>
+	</article><!--//container-->
+<?php echo $this->render('_parts/footer/footerShop.html') /* フッター */ ?>
+<?php echo $this->render('_parts/footer/analytics.html') /* Google Analytics */ ?>
+</body>
+</html>

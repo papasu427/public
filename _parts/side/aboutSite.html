@@ -1,0 +1,12 @@
+<?php if($this->side_attention[1] > 0): ?>
+						<div class="sideBoxBody">
+							<p class="comment">
+								<small>
+	<?php foreach($this->side_attention[0] as $key => $val): ?>
+								●<?php echo $this->escape($val['attention_title']); ?><br />
+	<?php endforeach; ?>
+							</small></p>
+							<p class="comment"><small>
+							<a href="<?php echo $this->escape($this->top_page); ?>attention/index.php">&raquo;&nbsp;サイトのご利用に関する詳細はこちら</a></small></p>
+						</div>
+<?php endif; ?>

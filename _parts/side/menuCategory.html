@@ -1,0 +1,50 @@
+<?php if (isset($this->disp_mode) && $this->disp_mode == 'cmpn') { ?>
+<div class="sideBoxBody-category">
+	<div class="sideBoxTitle-category"><p class="title">特売一覧</p></div>
+<?php
+	if (isset($this->no_campaign_flg)
+			&& $this->no_campaign_flg == false
+			&& is_array($this->menu_group_data[0])
+			&& count($this->menu_group_data[0]) > 0
+	) {
+		echo '	<ul class="menuList itemList">'."\n";
+		foreach ($this->menu_group_data[0] as $val) {
+			echo '		<li><div class="menuList">'."\n";
+			echo '			<a href="'.$this->escape($this->top_page).'shop/'.$this->escape($this->area_shop[0]['shop_code']).'/item_lst.php?cmpn=1&amp;evid='.$this->escape($val['event_id']).'" class="menu">'.$this->escape($val['event_name']).'</a>	'."\n";
+			echo '		</div></li>'."\n";
+		}
+		echo '	</ul>'."\n";
+	}
+echo '</div>'."\n";
+
+// 通常の表示モードの場合のみ表示
+} else if ( isset($this->disp_mode)
+				&& ($this->disp_mode == 'normal' || $this->disp_mode == 'dtl_srh')
+				&& is_array($this->side_disp_data)
+				&& count($this->side_disp_data) > 0
+		) {
+?>
+<div class="sideBoxBody-category">
+	<div class="sideBoxTitle-category"><p class="title"><?php echo $this->escape($this->side_disp_data['menu_group_name']); ?></p></div>
+<?php
+	if ( isset($this->side_disp_data['group_data']) && is_array($this->side_disp_data['group_data']) ) {
+		echo '	<ul class="menuList itemList">'."\n";
+		foreach ($this->side_disp_data['group_data'] as $gd_val) {
+?>
+		<li><div class="menuList" name="topmenu<?php echo $this->escape($gd_val['category_code']); ?>" id="topmenu<?php echo $this->escape($gd_val['category_code']); ?>">
+			<a href="<?php echo $this->escape($this->top_page); ?>shop/<?php echo $this->escape($this->area_shop[0]['shop_code']); ?>/item_lst.php?mgcd=<?php echo $this->escape($this->side_disp_data['menu_group_code']); ?>&amp;ctcd=<?php echo $this->escape($gd_val['category_code']); ?>"
+				class="menu" id="mmenu<?php echo $this->escape($gd_val['category_code']); ?>" onmouseover="mopen(<?php echo $this->escape($gd_val['category_code']); ?>);" onmouseout="mclosetime();"><?php echo $this->escape($gd_val['category_name']); ?></a>
+<?php
+			if ( isset($gd_val['group_data']) && is_array($gd_val['group_data']) ) {
+				echo '			<div class="submenu" id="menu'.$this->escape($gd_val['category_code']).'" onmouseover="mcancelclosetime()" onmouseout="mclosetime();">'."\n";
+				foreach ($gd_val['group_data'] as $small_val) {
+					echo '				<a href="'.$this->escape($this->top_page).'shop/'.$this->escape($this->area_shop[0]['shop_code']).'/item_lst.php?mgcd='.$this->escape($this->side_disp_data['menu_group_code']).'&amp;ctcd='.$this->escape($small_val['category_code']).'">'.$this->escape($small_val['category_name']).'</a>'."\n";
+				}
+				echo '			</div>'."\n";
+			}
+			echo '		</div></li>'."\n";
+		}
+		echo '	</ul>'."\n";
+	}
+	echo '</div>'."\n";
+}

@@ -1,0 +1,29 @@
+<link rel="stylesheet" href="<?php echo $this->escape($this->common_url); ?>f_js/jquery.bxslider/jquery.bxslider.css">
+<script src="<?php echo $this->escape($this->common_url); ?>f_js/jquery.bxslider/jquery.bxslider.min.js"></script>
+<script type="text/javascript">
+<!--
+$(document).ready(function(){
+	$('.bxslider').bxSlider({
+		auto: true,
+		speed:'1200',
+		mode: 'fade',
+	});
+});
+-->
+</script>
+<?php if (isset($this->banner_data[13]) && is_array($this->banner_data[13])) {?>
+	<div>
+		<div>
+			<ul class="bxslider">
+<?php foreach ($this->banner_data[13] as $_id => $_data) { ?>
+				<li id="siteTopSlide_<?php echo $this->escape($_id + 1); ?>" class="object-cover">
+					<a href="<?php echo $this->escape($_data['link_url']); ?>" <?php echo $this->escape(($_data['target_flg'] == 1) ? "target='_blank'" : ""); ?>>
+						<img src="<?php echo $this->escape($this->common_banner_url.$_data['img_file']); ?>" alt="<?php echo $this->escape($_data['banner_alt']); ?>" width="100%">
+					</a>
+				</li>
+<?php } ?>
+			</ul>
+		</div>
+	</div>
+	<hr class="h-2 border-0">
+<?php }?>

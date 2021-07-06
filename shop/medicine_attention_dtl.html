@@ -1,0 +1,523 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja" lang="ja">
+<head>
+<?php echo $this->render('_parts/header.html'); /* ヘッダーファイル追加   */ ?>
+<script type="text/javascript" src="<?php echo $this->escape($this->common_url); ?>n_js/item_category_list.js"></script>
+<script type="text/javascript" src="<?php echo $this->escape($this->common_url); ?>n_js/item_list.js"></script>
+<script type="text/javascript" src="<?php echo $this->escape($this->common_url); ?>n_js/jquery/jquery.growl.js"></script>
+
+<link rel="stylesheet" href="<?php echo $this->escape($this->common_url); ?>n_css/jquery.growl.css">
+<script type="text/javascript">
+<!--
+
+function cart_set($item_name){
+	var itcd = document.cart.p_item_code.value;
+	var ctcd = document.cart.p_group_code.value;
+	var num = document.cart.p_item_num.value;
+	// 注意喚起を確認
+	if(!check_attention()) {
+		return void(0);
+	}
+
+<?php
+// 追加注文モードを区別しない
+	$form_action = '/cart_set.php';
+	$token_str = '';
+?>
+	change_attention_checkbox_disabled();
+	setCart(itcd,$item_name,'',ctcd,num,'dtl');
+}
+
+function favorite_set(){
+	var itcd = document.favorite.p_item_code.value;
+	var ctcd = document.favorite.p_group_code.value;
+	var set_val = document.favorite.set.value;
+	var tkn  = document.favorite.token.value;
+	var itnm  = document.favorite.p_disp_item_name.value;
+
+	if(set_val == 'delete'){
+		location.href="<?php echo $this->escape($this->top_page); ?>shop/<?php echo $this->escape($this->shop_code); ?>/favorite_set.php?p_item_code="+itcd+"&tkn="+tkn+"&set=delete";
+	}else{
+		setFavorite(itcd, itnm, '', ctcd, 'dtl');
+	}
+}
+
+function to_date_sel(){
+	location.href="<?php echo $this->escape($this->top_page); ?>shop/<?php echo $this->escape($this->shop_code); ?>/date_sel.php";
+}
+
+function order_change(){
+	var mode  = document.order.mode.value;
+	var tkn  = document.order.token.value;
+	var oid  = document.order.p_order_id.value;
+	var odid = document.order.p_order_detail_id.value;
+	var num  = document.order.p_item_num.value;
+	var link_url  = "/order_edt_end.php";
+	window.location.href="<?php echo $this->escape($this->top_page); ?>mypage/finished/"+link_url+"?mode="+mode+"&tkn="+tkn+"&order_id="+oid+"&order_detail_id="+odid+"&order_num="+num;
+}
+
+function tkref(){
+	var form_cnt = window.opener.document.forms.length;
+
+	for(i=0; i<form_cnt; i++){
+		var el_cnt = window.opener.document.forms[i].elements.length;
+
+		for(j=0; j<el_cnt; j++){
+			if(window.opener.document.forms[i].elements[j].name == 'tkn'){
+				window.opener.document.forms[i].elements[j].value = '<?php echo $this->escape($this->token); ?>';
+			}
+		}
+	}
+}
+
+// 注意喚起チェック状態確認
+function check_attention() {
+	var attentions = document.getElementsByName('medicine_attention_chkbox');
+	var attentionsAll = {};
+	var checkResult = true;
+
+	if(typeof attentions !== 'undefined'){
+		for(var i=0; i<attentions.length; i++){
+			var checkValue = '0';
+			var checkText = '';
+			// チェック状態の注意喚起を保存
+			if(!attentions[i].disabled){
+//				console.log(attentions[i].disabled);
+				if( attentions[i].checked ){
+					checkValue = '1';
+				} else {
+					// 必須項目にチェックがない
+					if(attentions[i].value == 'essential'){
+						checkResult = false;
+					}
+				}
+				// 注意喚起テキスト取得
+					var sibl = attentions[i].parentNode.nextElementSibling;
+						if(!sibl) {
+							sibl = attentions[i].parentNode.nextSibling;
+						}
+						if(typeof sibl.innerHTML !== 'undefined'){
+					checkText = sibl.innerHTML;
+						} else if(sibl.textContent !== 'undefined') {
+					checkText = sibl.textContent;
+						} else if(sibl.innerText !== 'undefined') {
+					checkText = sibl.innerText;
+				}
+
+				attentionsAll[i] = {
+					"text" : checkText,
+					"value" : checkValue
+				};
+			}
+		}
+
+		// すべての必須項目にチェックあり
+		if(checkResult){
+			if(attentions.length > 0){
+				checkResult = add_medicine_attention_history(attentionsAll);
+			}
+		} else {
+			alert("注意事項をよくお読みください。\n注意事項の確認チェックが不足しているためご購入頂けません。");
+		}
+	}
+
+	return checkResult;
+}
+
+// 注意喚起チェックを変更できなくする
+function change_attention_checkbox_disabled() {
+	var attentions = document.medicine_attention_list.medicine_attention_chkbox;
+	if(typeof attentions == 'undefined'){
+		return;
+	}
+	var attentionsCount = attentions.length;
+
+	for(var i=0; i<attentionsCount; i++){
+		attentions[i].disabled = true;
+	}
+}
+
+// 注意喚起の確認状況を保存
+function add_medicine_attention_history(checkList){
+	var url = document.medicine_attention_list.action;
+	var shop_code = "<?php echo $this->escape($this->shop_code); ?>";
+	var item_code = document.cart.p_item_code.value;
+	var member_id = "<?php echo $this->escape($this->member_data['member_id']); ?>";
+	var history_add_result = false;
+
+	try{
+		var param = {
+			"shop_code":shop_code
+			,"item_code":item_code
+			,"member_id":member_id
+			,"check_list":checkList
+			,"p_aj_mode":"1"
+			,"p_time":new Date().getTime()
+		};
+		$.ajax({
+			type: "POST",
+			url: url,
+			headers: {"pragma": "no-cache"},
+			data: param,
+			dataType: "json",
+			cache: false,
+			async: false,
+			success: function attention(data){
+				//画面ごとの表示
+				try{
+					var result = data.result;
+
+					// 正常
+					if(result){
+						history_add_result = true;
+					} else {
+						var error     = new Error();
+						error.name    = "add_medicine Err ";
+						error.message = data.error_msg + data.comment;
+						detailError(error);
+					}
+				} catch(e){
+					detailError(e);
+				}
+			},
+			error: function(xhr, status, err){
+				var error     = new Error();
+				error.name    = "POST Failure ";
+				error.message = err.substr(0, 50);
+				detailError(error);
+			},
+		});
+	}catch(e){
+		throw e;
+	}
+
+	return history_add_result;
+}
+
+// 薬剤師に相談ボタン
+function move_pharmacist_counsel(){
+	document.counsel.submit();
+	return true;
+}
+
+function detailError(e){
+	document.error_list.output_flg.value = "0";
+	document.error_list.error_file.value = 1;
+	document.error_list.error_line.value = 1;
+	document.error_list.error_type.value = 9;
+	document.error_list.error_msg.value = "通信エラーです。";
+	document.error_list.comment.value = e;
+	document.error_list.submit();
+}
+//-->
+</script>
+</head>
+<body>
+	<div id="wrap">
+		<?php echo $this->render('_parts/contents_top.html'); /* コンテンツトップ */ ?>
+		<article id="container">
+			<div class="Box medicineAttention" id="itemDetail">
+				<div class="medicine_attention_title"><h2>注意</h2></div>
+				<div class="medicineAttentionDetailBox">
+					<div class="medicine_attention_top">
+						『<?php echo $this->escape($this->medicine_data_info['disp_item_name']); ?>』は<span>医薬品</span>です。<br>ご購入の前に、ご自身で必ず注意書き等をお読みになり、内容について了承したうえで、ご注文ください。
+					</div>
+<?php if( isset($this->medicine_data_info['prohibition']) && strlen(($this->medicine_data_info['prohibition'])) > 0 ): ?>
+					<div class="medicine_attention_contents">
+						<div class="medicineProhibition">
+							<?php echo $this->medicine_data_info['prohibition']; ?>
+						</div>
+					<!--//medicine_attention_contents--></div>
+<?php endif; ?>
+					<div class="medicineAttentionConfirmation itemDetailBoxBox">
+<?php if(count($this->medicine_data_info['attention_list']) > 0): ?>
+						<div class="plzText">
+						以下の注意をよくお読みの上、該当する項目にチェックをしてください。
+						</div>
+<?php endif; ?>
+						<div class="medicineAttentionExplanation">
+							<form name="medicine_attention_list" action="./add_medicine_attention_check.php">
+	<?php if(count($this->medicine_data_info['attention_list']) > 0): ?>
+								<table>
+									<tbody>
+		<?php foreach($this->medicine_data_info['attention_list'] as $key => $val): ?>
+										<tr>
+				<?php if($this->medicine_attention_disp_flg): ?>
+					<?php if($val['attention_template_flg'] == 1): ?>
+											<td class="medicineAttentionCheck"><input type="checkbox" value="essential" name="medicine_attention_chkbox"></td>
+					<?php else: ?>
+											<td class="medicineAttentionCheck"><input type="checkbox" value="optional" name="medicine_attention_chkbox"></td>
+					<?php endif; ?>
+				<?php else: ?>
+											<td class="medicineAttentionCheck">■</td>
+				<?php endif; ?>
+											<td class="medicineAttentionExplanation" name="medicineAttentionExplanation"><?php echo $this->escape($val['attention_template_text']); ?></td>
+										</tr>
+		<?php endforeach; ?>
+									</tbody>
+								</table>
+	<?php endif; ?>
+							</form>
+						<!--//medicineAttentionExplanation--></div>
+	<?php if($this->medicine_attention_disp_flg): ?>
+	<?php
+		$next_button_name = "変更";
+		if($this->order_change_flg === false) {
+			$next_button_name = (isset($this->add_item_mode) && $this->add_item_mode == false) ? "カゴへ" : "追加";
+		}
+	?>
+						<div class="medicineAttentionConfirmationMsg">
+							上記の内容に同意・了承頂き、商品をご購入される方は「<?php echo $this->escape($next_button_name); ?>」を選択してください。
+						</div>
+	<?php endif; ?>
+					<!--//medicineAttentionConfirmation--></div>
+
+				<!--//medicineAttentionDetailBox--></div>
+				<div class="itemDetailBox">
+					<div class="itemFloatBox">
+<?php
+$div_str ='class="itemCartSet"';
+// 「数量セレクトとカゴへボタン」または購入不可アイコンの表示
+// とりあえず見学中は買えない
+if ($this->tour_flg) {
+	echo '					<div class="itemMarkBox"><p class="mark mark1">店内見学中</p></div>'."\n";
+} else {
+	// 品切れ中も買えない
+	if ($this->medicine_data_info['stockout']) {
+		$item_str ='<p class="mark mark1">品切れ中</p>';
+		$div_str ='class="itemStockOut"';
+		//echo '					<div class="itemStockOut"><p class="mark mark1">品切れ中</p></div>'."\n";
+
+	// カゴに入っている
+	} else if ($this->medicine_data_info['in_cart']) {
+		$item_str ='<p class="mark markCartIn">選択済</p>';
+		//echo '					<div class="itemCartSet"><p class="mark markCartIn">選択済</p></div>'."\n";
+
+	// 数量セレクトとカゴへ
+	} else {
+		if ($this->order_change_flg === false) {
+?>
+						<div class="itemNum"  id="itemOp_<?php echo $this->escape($this->medicine_data_info['item_code']); ?>">
+							<form method="post" name="cart" action="">
+								<?php echo $this->medicine_data_info['quantity_select_html'];?>
+								<input type="hidden" name="p_item_code" value="<?php echo $this->escape($this->medicine_data_info['item_code']); ?>" />
+								<input type="hidden" name="p_group_code" value="<?php echo $this->escape($this->ctcd); ?>" />
+								<input type="hidden" name="token" value="<?php echo $this->escape($this->token); ?>" />
+							</form>
+						</div>
+<?php
+			$item_str = '<a href="javascript:cart_set(\''.$this->escape($this->medicine_data_info["disp_item_name"]).'\');" class="button button1">';
+			$item_str .= $next_button_name;
+			$item_str .= '</a>';
+		} else {
+?>
+						<div class="itemNum">
+							<form method="post" name="order" action="">
+								<?php echo $this->medicine_data_info['quantity_select_html']; ?>
+								<input type="hidden" name="mode" value="change" />
+								<input type="hidden" name="p_order_id" value="<?php echo $this->escape($this->oid); ?>" />
+								<input type="hidden" name="p_order_detail_id" value="<?php echo $this->escape($this->odid); ?>" />
+								<input type="hidden" name="token" value="<?php echo $this->escape($this->token); ?>" />
+							</form>
+						</div>
+<?php
+			$item_str ='<p class="itemBtnImages"><a href="javascript:order_change();" class="button button1">'.$next_button_name.'</a></p>';
+		}
+	}
+?>
+						<div class="dtlCommonButtonList">
+							<div id="itemBox_<?php echo $this->escape($this->medicine_data_info['item_code']); ?>" <?php echo $div_str; ?>>
+								<?php echo $item_str; ?>
+							</div>
+<?php
+	if($this->order_change_flg === false) {
+		$fvl_str = '<form method="post" name="favorite" action="">';
+		$fvl_str .= '<input type="hidden" name="p_item_code" value="'.$this->escape($this->medicine_data_info["item_code"]).'" />';
+		$fvl_str .= '<input type="hidden" name="p_group_code" value="'.$this->escape($this->ctcd).'" />';
+		$fvl_str .= '<input type="hidden" name="token" value="'.$this->escape($this->token).'" />';
+		$fvl_str .= '<input type="hidden" name="p_disp_item_name" value="'.$this->escape($this->medicine_data_info["disp_item_name"]).'" />';
+
+		if($this->medicine_data_info['favorite']===false){
+			$fvl_str .='<input type="hidden" name="set" value="insert" />';
+			$fvl_str .='<a href="javascript:favorite_set();" class="button button3">お気に入りへ</a>';
+			} else {
+			$fvl_str .='<input type="hidden" name="set" value="delete" />';
+			$fvl_str .='<a href="javascript:favorite_set();" class="button button3">お気に入り解除</a>';
+		}
+		$fvl_str .='</form>';
+	}
+?>
+							<div id="favBox_<?php echo $this->escape($this->medicine_data_info['item_code']); ?>" class="itemfavoriteSet">
+								<?php echo $fvl_str; ?>
+							</div>
+						</div>
+						<div class="dtlCounselButtonList">
+							<div class="pharmacistCounsel" id="itemBox_<?php echo $this->escape($this->medicine_data_info['item_code']); ?>">
+								<form method="post" name="counsel" action="<?php echo $this->escape($this->top_page); ?>medicine/counsel_reg.php">
+									<a class="button button5" href="javascript:move_pharmacist_counsel();">薬剤師に相談</a>
+									<input type="hidden" name="mode" value="<?php echo $this->escape($this->medicine_data_info['mode']); ?>" />
+									<input type="hidden" name="item_code" value="<?php echo $this->escape($this->medicine_data_info['item_code']); ?>" />
+									<input type="hidden" name="category_code" value="<?php echo $this->escape($this->ctcd); ?>" />
+									<input type="hidden" name="order_id" value="<?php echo $this->escape($this->oid); ?>" />
+								</form>
+							</div>
+						</div>
+					</div>
+<?php } ?>
+				<!--//itemDetailBox--></div>
+			<!--//itemDetail--></div>
+			<nav class="shopNaviBox">
+				<div class="linkBox" id="boxOpen110" style="display: none;">
+					<p class="linkNavi">»&nbsp;<a onclick="showPlagin(110);return false;" title="お問い合わせ情報はこちら" class="showBoxLink" href="#">お問い合わせ情報はこちら</a></p>
+				</div>
+				<div class="linkBox" id="boxClose110">
+					<p class="linkNavi">»&nbsp;<a onclick="showPlagin(110);return false;" title="お問い合わせ情報を閉じる" class="showBoxLink" href="#">お問い合わせ情報を閉じる</a></p>
+					<div class="medicineAttentionInquiry">
+						<div class="medicineMaker">
+							<div class="medicineDetailTitle">＜製造販売元：問い合わせ先＞</div>
+							<div class="medicineDetailData">
+								<div class="medicineDetailSubdata"><?php echo $this->medicine_data_info['maker_info']; ?></div>
+							</div>
+						<!--//medicineMaker--></div>
+						<div class="madicineShopInquiry shopNaviBox">
+							<div class="medicineDetailTitle">＜店舗：問い合わせ先＞</div>
+							<div class="medicineDetailData">
+								<div class="medicineShopName"><?php echo $this->escape($this->medicine_shop_inquiry['shop_officiall_name']); ?></div>
+								<div class="medicineDetailSubdata">
+									<table>
+										<tbody>
+											<tr><td class="medicineDetailSubdataTitle">●所在地</td></tr>
+											<tr><td><?php echo $this->escape($this->medicine_shop_inquiry['shop_address']); ?></td></tr>
+										</tbody>
+									</table>
+									<table cols=2>
+										<tbody>
+											<tr>
+												<td class="medicineDetailSubdataTitle" colspan="2">●相談窓口及び緊急連絡先</td>
+											</tr>
+													<tr>
+														<td class="headword" colspan="2">
+															<?php echo $this->escape($this->medicine_shop_inquiry['shop_officiall_name']); ?>
+														</td>
+													</tr>
+											<tr>
+												<td class="headword">受付時間</td>
+												<td><?php echo $this->escape($this->medicine_shop_inquiry['shop_conference_time_text']); ?></td>
+											</tr>
+	<?php if(isset($this->medicine_shop_inquiry['shop_conference_tell']) && strlen($this->medicine_shop_inquiry['shop_conference_tell']) > 0): ?>
+											<tr>
+												<td  class="headword">電話番号</td>
+												<td><?php echo $this->escape($this->medicine_shop_inquiry['shop_conference_tell']); ?></td>
+											</tr>
+	<?php endif; ?>
+	<?php if(isset($this->medicine_shop_inquiry['shop_conference_fax']) && strlen($this->medicine_shop_inquiry['shop_conference_fax']) > 0): ?>
+											<tr>
+												<td  class="headword">FAX</td>
+												<td><?php echo $this->escape($this->medicine_shop_inquiry['shop_conference_fax']); ?></td>
+											</tr>
+	<?php endif; ?>
+	<?php if(isset($this->medicine_shop_inquiry['shop_conference_mail']) && strlen($this->medicine_shop_inquiry['shop_conference_mail']) > 0): ?>
+											<tr>
+												<td  class="headword">メール</td>
+												<td><?php echo $this->escape($this->medicine_shop_inquiry['shop_conference_mail']); ?></td>
+											</tr>
+	<?php endif; ?>
+	<?php if ($this->medicine_shop_inquiry['shop_conference_free_text']): ?>
+											<tr>
+												<td class="headword" colspan="2">
+													<?php echo $this->escape($this->medicine_shop_inquiry['shop_conference_free_text']); ?>
+												</td>
+											</tr>
+	<?php endif; ?>
+	<?php if(isset($this->medicine_shop_inquiry['shop_conference_overtime_tell']) && strlen($this->medicine_shop_inquiry['shop_conference_overtime_tell']) > 0
+					|| isset($this->medicine_shop_inquiry['shop_conference_overtime_fax']) && strlen($this->medicine_shop_inquiry['shop_conference_overtime_fax']) > 0
+					|| isset($this->medicine_shop_inquiry['shop_conference_overtime_mail']) && strlen($this->medicine_shop_inquiry['shop_conference_overtime_mail']) > 0): ?>
+											<tr>
+												<td class="medicineDetailSubdataTitle" colspan="2">●時間外相談窓口</td>
+											</tr>
+		<?php if(isset($this->medicine_shop_inquiry['shop_conference_overtime_tell']) && strlen($this->medicine_shop_inquiry['shop_conference_overtime_tell']) > 0): ?>
+											<tr>
+												<td  class="headword">電話番号</td>
+												<td><?php echo $this->escape($this->medicine_shop_inquiry['shop_conference_overtime_tell']); ?></td>
+											</tr>
+		<?php endif; ?>
+		<?php if(isset($this->medicine_shop_inquiry['shop_conference_overtime_fax']) && strlen($this->medicine_shop_inquiry['shop_conference_overtime_fax']) > 0): ?>
+											<tr>
+												<td  class="headword">FAX</td>
+												<td><?php echo $this->escape($this->medicine_shop_inquiry['shop_conference_overtime_fax']); ?></td>
+											</tr>
+		<?php endif; ?>
+		<?php if(isset($this->medicine_shop_inquiry['shop_conference_overtime_mail']) && strlen($this->medicine_shop_inquiry['shop_conference_overtime_mail']) > 0): ?>
+											<tr>
+												<td  class="headword">メール</td>
+												<td><?php echo $this->escape($this->medicine_shop_inquiry['shop_conference_overtime_mail']); ?></td>
+											</tr>
+		<?php endif; ?>
+	<?php endif; ?>
+										</tbody>
+									</table>
+								</div>
+							</div>
+						<!--//madicineShopInquiry--></div>
+					<!--//medicineAttentionInquiry--></div>
+				<!--//shopNaviBox--></div>
+			<!--//shopNaviBox--></nav>
+<?php
+if ( ! $this->tour_flg ) {
+	if ($this->medicine_data_info['favorite']===false) {
+		echo '		<form name="favorite_set" action="favorite_set.php" method="post">'."\n";
+		echo '			<input type="hidden" name="tkn" value="'.$this->escape($this->token).'" />'."\n";
+		echo '			<input type="hidden" name="p_item_code" value="" />'."\n";
+		echo '			<input type="hidden" name="p_event_id" value="" />'."\n";
+		echo '			<input type="hidden" name="p_group_code" value="" />'."\n";
+		echo '			<input type="hidden" name="p_list_file" value="'.$this->escape(basename($this->url)).'" />'."\n";
+
+		echo '		</form>'."\n";
+	} else {
+		echo '		<form name="favorite_del" action="favorite_set.php" method="post">'."\n";
+		echo '			<input type="hidden" name="tkn" value="'.$this->escape($this->token).'" />'."\n";
+		echo '			<input type="hidden" name="p_item_code" value="" />'."\n";
+		echo '			<input type="hidden" name="p_event_id" value="" />'."\n";
+		echo '			<input type="hidden" name="p_group_code" value="" />'."\n";
+		echo '			<input type="hidden" name="set" value="delete" />'."\n";
+		echo '			<input type="hidden" name="p_list_file" value="'.$this->escape(basename($this->url)).'" />'."\n";
+		echo '		</form>'."\n";
+	}
+	// 追加注文モードの区別はしない
+	$form_action = 'cart_set.php';
+	echo '		<form name="cart_set" action="'.$this->escape($form_action).'" method="post">'."\n";
+	echo '			<input type="hidden" name="tkn" value="'.$this->escape($this->token).'" />'."\n";
+	echo '			<input type="hidden" name="p_item_code" value="" />'."\n";
+	echo '			<input type="hidden" name="p_campain_item" value="" />'."\n";
+	echo '			<input type="hidden" name="p_event_id" value="" />'."\n";
+	echo '			<input type="hidden" name="p_group_code" value="" />'."\n";
+	echo '			<input type="hidden" name="p_item_num" value="" />'."\n";
+	echo '			<input type="hidden" name="p_list_file" value="'.$this->escape(basename($this->url)).'" />'."\n";
+	echo '			<input type="hidden" name="p_error" value="" />'."\n";
+	echo '		</form>'."\n";
+}
+?>
+		<form name="error_list" action="<?php echo $this->escape($this->top_page.'error.php') ?>" method="post">
+			<input type="hidden" name="output_flg" value="" />
+			<input type="hidden" name="error_file" value="" />
+			<input type="hidden" name="error_line" value="" />
+			<input type="hidden" name="error_type" value="" />
+			<input type="hidden" name="error_msg" value="" />
+			<input type="hidden" name="next_file" value="" />
+			<input type="hidden" name="comment" value="" />
+		</form>
+<?php echo $this->render('_parts/modules/cartTotalBox.html'); /* カート合計金額とレジボタン */ ?>
+<?php echo $this->render('_parts/modules/searchItemBox.html'); /* 商品検索 */ ?>
+
+		<div class="Box">
+			<div class="submitBox">
+				<p><a href="<?php echo $this->escape($this->backUrl) ?>" class="button buttonBack"><?php echo $this->escape($this->backUrlName) ?>へ戻る</a></p>
+			</div>
+		</div>
+
+	</article>
+	<?php echo $this->render('_parts/footer/footer.html'); /* フッター */ ?>
+<!--wrap--></div>
+<?php echo $this->render('_parts/footer/analytics.html'); /* Google Analytics */ ?>
+</body>
+</html>

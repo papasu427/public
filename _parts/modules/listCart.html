@@ -1,0 +1,120 @@
+<?php if(isset($this->side_cart_item['result']) && $this->side_cart_item['result']): ?>
+		<div id="cart-check-modal-content" class="w-11/12 bg-white hidden m-5 hidden top-0 absolute z-50">
+			<div class="flex items-center h-30 bg-button p-2">
+				<p class="text-white ml-3">カート内商品確認
+<?php if (isset($this->charge_msg_s[2])) { ?>
+					<span>
+						<b><?php echo $this->escape($this->charge_msg_s[2]); ?></b>
+					</span>
+<?php } ?>
+				</p>
+				<span id="modal-cart-close" class="flex-1 text-right text-size20 text-white">×</span>
+			</div>
+	<?php if(isset($this->side_cart_item['data']) && count($this->side_cart_item['data']) > 0): ?>
+		<?php
+			// 追加注文モードの時はレジへボタンの送信先を変更
+			if ( ! $this->add_item_mode ) {
+				$order_edt = 'order_edt.php';
+			}else{
+				$order_edt = 'add_order_edt.php';
+			}
+		?>
+			<div class="flex flex-wrap p-3" id="cart_index">
+				<?php $cart_cnt = 0; ?>
+				<?php foreach($this->side_cart_item['data'] as $key => $val): ?>
+					<?php
+						// 商品画像があるか。無ければnoimage.jpgを表示
+						if (file_exists($this->box_path.$val['item_code'].'.jpg')
+							&& is_readable($this->box_path.$val['item_code'].'.jpg')
+						) {
+							clearstatcache();
+							$img_url = $this->box_url.$val['item_code'].'.jpg';
+						} else {
+							$img_url = $this->box_url.'noimage.jpg';
+						}
+
+						// JSに渡す引数を生成
+						$_detail_js_arg  = "'".$this->escape($val['item_code'])."'";
+						if (isset($val['category_code']) && $val['category_code'] != '') {
+							$_detail_js_arg .= ",'".$this->escape($val['category_code'])."'";
+						} else {
+							$_detail_js_arg .= ",''";
+						}
+
+						// 「店内見学でない」場合のみお気に入り状態アイコンの表示
+						$_js_arg="";
+						if ( $this->isLogin && ! $this->tour_flg ) {
+							// JavaScript関数に渡す引数部分の文字列をあらかじめ作っておく
+							$_js_arg = "'".$this->escape($val['item_code'])."'";
+							$_js_arg .= ",'".$this->escape($val['full_item_name'])."'";
+							if (isset($val['event_id'])) {
+								$_js_arg .= ",'".$this->escape($val['event_id'])."'";
+							} else {
+								$_js_arg .= ",''";
+							}
+							if (isset($val['category_code'])) {
+								$_js_arg .= ",'".$this->escape($val['category_code'])."'";
+							} else {
+								$_js_arg .= ",''";
+							}
+						}
+					?>
+					<div class="w-1/2 mb-5">
+						<div class="table align-middle m-3">
+							<div class="table-row">
+								<img class="inline-block pic-size1" src="<?php echo $img_url ?>">
+							</div>
+							<div class="table-row">
+								<ul class="trade-name tx-size10 tracking-wide">
+									<li class="ml-10pt"><?php echo $val['full_item_name']; ?></li>
+								</ul>
+							</div>
+							<div class="table-row">
+								<div class="relative ml-10pt w-full mt-2">
+									<div class="inline-block align-top">
+										<b class="tx-color-money tx-size13 pic-size2">
+										<?php if(isset($val['event_id']) && strlen($val['event_id']) > 0) {
+											echo $this->escape(number_format($val['event_price']));
+										} else {
+											echo $this->escape(number_format($val['sell_price']));
+										}?>
+										円</b>
+									</div>
+								</div>
+							</div>
+							<div class="m-auto">
+								<?php $id_val = $val ?>
+								<?php $id_val['in_cart'] = true; ?>
+								<?php $id_val['stockout'] = false; ?>
+								<?php $medicine_display_flg = false; ?>
+								<?php include('cartButton.html'); ?>
+							</div>
+						</div>
+					</div>
+					<?php $cart_cnt++; ?>
+				<?php endforeach; ?>
+			</div>
+			<div id="modal_footer_cart" class="bg-footer">
+				<div class="bg-footer">
+					<div class="flex pt-1 pb-1 items-center w-full rounded whitespace-no-wrap">
+						<div class="flex-1 align-top tx-color1 text-right pl-2 mr-3">
+							<div class="text-size16">
+								<span class="text-size10 pr-1">小計</span>
+								<span id="sum_price_f_modal" class="font-bold"><?php echo number_format($this->escape($this->cart_price)) ?>円</span>
+							</div>
+							<div class="text-size10">
+								<b><?php echo $this->escape($this->delivery_fee.' '.number_format($this->order_data['delivery_charge'])); ?>円</b>
+							</div>
+						</div>
+						<div id="cart-check_f_modal" class="flex-tinitial m-3 ml-4 mr-4 text-center bg-cart w-full p-2 h-30 font-bold">
+							<a href="<?php echo $this->escape($this->top_page); ?>order/<?php echo $this->escape($this->shop_code); ?>/<?php echo $this->escape($order_edt); ?>"
+								 class="text-white text-size12 h-full w-full block">購入画面へ</a>
+						</div>
+					</div>
+				</div>
+			</div>
+	<?php else: ?>
+			<div class="h-20 center"><p class="m-20">カートに商品はありません。</p></div>
+	<?php endif; ?>
+		</div>
+<?php endif; ?>

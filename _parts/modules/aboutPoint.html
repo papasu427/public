@@ -1,0 +1,39 @@
+<?php
+if (isset($this->side_info)
+	&& $this->side_info != false):
+
+	$_pre_title = '';
+	if (isset($this->side_info['rank_str'])) {
+		$_pre_title .= 'ランク';
+	}
+	if (isset($this->side_info['have_point'])) {
+		$_pre_title .= ($_pre_title != '' ? '・' : '').'ポイント';
+	}
+	if (isset($this->side_info['have_coupon'])) {
+		$_pre_title .= ($_pre_title != '' ? '・' : '').'クーポン';
+	}
+
+?>
+	<div id="boxOpen95" class="bd-b-color-gray-light">
+		<p class="text-right text-size12 tx-color6 m-3">&raquo;&nbsp;<a href="#" title="<?php echo $this->escape($_pre_title); ?>情報はこちら" onclick="showPlagin(95);return false;"><?php echo $this->escape($_pre_title); ?>情報はこちら</a></p>
+	</div>
+	<div id="boxClose95" class="bd-b-color-gray-light" style="display:none" >
+		<p class="text-right text-size12 tx-color6 m-3">&raquo;&nbsp;<a href="#" title="<?php echo $this->escape($_pre_title); ?>情報を閉じる" onclick="showPlagin(95);return false;"><?php echo $this->escape($_pre_title); ?>情報を閉じる</a></p>
+		<aside class="aboutPointBox">
+			<ul class="aboutPointList">
+<?php if (isset($this->side_info['rank_str']) && $this->side_info['rank_str'] != '') { ?>
+				<li><span class="label">現在のランク：<?php echo $this->escape($this->side_info['rank_str']); ?>ランク</span></li>
+<?php } ?>
+<?php if (isset($this->side_info['have_point']) && isset($this->com_loyalty_info['shop_point']) && $this->com_loyalty_info['shop_point'] != false) { ?>
+				<li><span class="label">保有ポイント：<?php echo $this->escape($this->side_info['have_point']); ?>ポイント</span></li>
+<?php } ?>
+<?php if (isset($this->side_info['have_coupon'])) { ?>
+				<li><span class="label">保有クーポン：<a href="<?php echo $this->escape($this->top_page.'mypage/index.php'); ?>"><?php echo $this->escape($this->side_info['have_coupon']); ?>枚</a></span></li>
+<?php } ?>
+			</ul>
+		</aside>
+	</div>
+<?php if (isset($this->side_info['login_point']) && $this->side_info['login_point'] > 0) { ?>
+	<span class="caution">&nbsp;ログインにより+<?php echo $this->escape($this->side_info['login_point']); ?>ポイントゲット！</span>
+<?php } ?>
+<?php endif;?>

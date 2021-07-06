@@ -1,0 +1,12 @@
+<?php if($this->agreement_list[1] > 0): ?>
+					<div class="m-2 p-2 tx-color1 org-border1 rounded">
+	<?php foreach($this->agreement_list[0] as $key => $val): ?>
+						<div class="m-2 p-2 tx-color1 bg-color2 org-border1 rounded">
+							<p><?php echo $this->escape($val['agreement_title']); ?></p>
+						</div>
+						<div class="inline-flex items-center tx-size12">
+							<p><?php echo $val['agreement_body']; ?></p>
+						</div>
+	<?php endforeach; ?>
+					</div>
+<?php endif; ?>

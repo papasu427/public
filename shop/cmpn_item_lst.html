@@ -1,0 +1,267 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja" lang="ja">
+<head>
+<?php
+echo $this->render('_parts/header.html'); /* ヘッダーファイル追加   */
+?>
+<script type="text/javascript" src="<?php echo $this->escape($this->common_url); ?>n_js/item_category_list.js"></script>
+<script type="text/javascript" src="<?php echo $this->escape($this->common_url); ?>n_js/jquery/jquery.colorbox.js"></script>
+<script type="text/javascript" src="<?php echo $this->escape($this->common_url); ?>n_js/item_list_more.js"></script>
+<script type="text/javascript" src="<?php echo $this->escape($this->common_url); ?>n_js/item_list.js"></script>
+<script type="text/javascript">
+<!--
+$(function(){
+    $('.slidemenu').slideMenu();
+});
+
+-->
+</script>
+</head>
+<body onload="flg_reset();">
+	<div id="wrap">
+<?php echo $this->render('_parts/contents_top.html'); /* コンテンツトップ */ ?>
+		<article id="container">
+		<?php echo $this->render('_parts/modules/emergencyBox.html') /* 警告Box */ ?>
+			<div id="boxOpen999" class="itemCategoryTabBox">
+
+				<ul class="itemCategoryTabList clearfix">
+
+					<li class="tabMenu"><a href="date_sel.php" class="button buttonTab" title="配達便選択">配達便選択</a></li>
+					<li class="tabMenu"><a href="#" class="button buttonTab" title="<?php echo $this->str_cmpn_label; ?>" onclick="showPlagin(999);return false;"><?php echo $this->str_cmpn_label; ?></a></li>
+					<li class="tabMenu"><a href="#searchItem" class="button buttonTab">商品検索</a></li>
+
+				</ul>
+
+			</div>
+			<div id="boxClose999" class="itemCategoryTabBox" style="display:none" >
+				<ul class="itemCategoryTabList clearfix">
+					<li class="tabMenu"><a href="date_sel.php" class="button buttonTab" title="配達便選択">配達便選択</a></li>
+					<li class="tabMenu"><a href="#" class="button buttonTab" title="<?php echo $this->str_cmpn_label; ?>" onclick="showPlagin(999);return false;"><?php echo $this->str_cmpn_label; ?></a></li>
+					<li class="tabMenu"><a href="#searchItem" class="button buttonTab">商品検索</a></li>
+				</ul>
+				<h2 class="title" style="margin-top:2px"><?php echo $this->str_cmpn_label; ?></h2>
+				<div class="timeline" >
+					<form name="item_list" action="" method="post" id="itemListForm">
+						<div id="cmpn_list">
+<?php foreach($this->cmpn_data as $key => $cmpn_val): ?>
+							<div class="itemListBox" id="d_<?php echo $this->escape($cmpn_val['event_id']); ?>">
+								<div class="itemInfoBox">
+									<a href="cmpn_item_lst.php?evid=<?php echo $this->escape($cmpn_val['event_id']); ?>" class="itemListLink">
+										<div class="itemTextBox">
+											<p class="itemTitle"><?php echo $this->escape($cmpn_val['event_name']); ?>
+		<?php if($cmpn_val['disp_date_flg'] == 0): ?>
+												<br/><?php echo $this->escape($cmpn_val['disp_event_date']); ?>
+			<?php if(isset($cmpn_val['disp_week_str']) && strlen($cmpn_val['disp_week_str']) > 0): ?>
+												<br/><?php echo $this->escape($cmpn_val['disp_week_str']); ?>
+			<?php endif; ?>
+		<?php endif; ?>
+											</p>
+										</div>
+									</a>
+								</div>
+							<!--//itemListBox--></div>
+<?php endforeach; ?>
+						<!--//updates--></div>
+					</form>
+				<!--//timeline--></div>
+			<!--//boxClose--></div>
+
+			<div class="Box">
+				<h2 class="title"><?php echo $this->escape($this->campaign_event_data['event_name']); ?>
+				<?php if($this->campaign_event_data['disp_date_flg'] == 0): ?>
+					<br/><?php echo $this->escape($this->campaign_event_data['disp_event_date']); ?>
+				<?php endif; ?>
+				</h2>
+				<?php if (isset($this->mdcn_exists) && $this->mdcn_exists == true): ?>
+					<div class="announceBox"><p><a href="<?php echo $this->escape($this->top_page.'medicine/index.php'); ?>">薬店による管理および運営に関する事項を開く</a></p></div>
+				<?php endif; ?>
+			</div>
+<?php $this->render('_parts/modules/campaignItemListBnr.html'); ?>
+<?php
+if (! $this->item_exists) {
+	echo '<p><span class="caution">商品が見つかりませんでした。</span></p>'."\n";
+} else {
+	if (is_array($this->item_data)) {
+?>
+
+<div class="toolBox">
+	<div class="toolBoxBody">
+		<ul class="naviList"><li class="viewNum">全<strong><?php echo $this->escape($this->item_data[1]); ?></strong> 件</li></ul>
+		<ul class="submitList">
+			<li><a href="#" title="並び替え" class="popup button buttonCheck">並び替え</a></li>
+		</ul>
+	</div>
+</div>
+
+<div class="timeline" >
+	<div id="updates">
+
+<?php
+$reduced_tax_disp = $this->getSetting('reduced_tax_disp');
+$reduced_none_tax_disp = $this->getSetting('reduced_none_tax_disp');
+$reduced_tax_disp_flg = false;
+$reduced_tax_start_date = _ASP_REDUCED_TAX_START_DATE;
+if (strlen($reduced_tax_disp) > 0 && $reduced_tax_start_date <= date('Y-m-d')) {
+	//軽減税率導入後は税率を表示する
+	$reduced_tax_disp_flg = true;
+}
+
+$p_exec_count = 0;
+foreach ($this->item_data[0] as $id_key => $id_val) {
+	$p_exec_count = $this->escape($p_exec_count);
+
+	// 商品画像があるか。無ければnoimage.jpgを表示
+	if (file_exists($this->box_path.$id_val['item_code'].'.jpg')
+		&& is_readable($this->box_path.$id_val['item_code'].'.jpg')
+	) {
+		clearstatcache();
+		$img_url = $this->box_url.$id_val['item_code'].'.jpg';
+	} else {
+		$img_url = $this->box_url.'noimage.jpg';
+	}
+
+?>
+	<div class="itemListBox" id="d_<?php echo $this->escape($id_val['item_code']); ?>">
+		<div class="itemInfoBox">
+			<div class="itemImagesBox">
+				<p class="itemImages"><img src="<?php echo $this->escape($img_url); ?>" class="itemThumbImages_m" alt="<?php echo $this->escape($id_val['full_item_name']); ?>" /></p>
+			</div>
+			<a href="cmpn_item_dtl.php?itcd=<?php echo $this->escape($id_val['item_code']); ?>" class="itemListLink">
+				<div class="itemTextBox">
+					<p class="itemIcon">
+<?php
+					// 配列に溜めたアイコンを表示
+					if (count($id_val['ary_icon']) == 0) {
+						echo '&nbsp;';
+					} else {
+						foreach ($id_val['ary_icon'] as $ary_val) {
+							echo '<img src="'.$ary_val['url'].'" alt="'.$ary_val['alt'].'" style="padding:1px"/>';
+						}
+					}
+?>
+					</p>
+					<p class="itemTitle"><?php echo $this->escape($id_val['full_item_name']); ?></p>
+<?php
+// ポイント倍付け商品とそうでない商品で表示する価格が異なるため、それを決定する
+$base_price = null;
+$intax_price = null;
+					if ($this->campaign_event_data['event_type_flg'] == 1) {
+						// ポイント倍付けのときは標準価格
+	$base_price = $id_val['sell_base_price'];
+	$intax_price = $id_val['sell_price'];
+					} else {
+	$base_price = $id_val['event_base_price'];
+	$intax_price = $id_val['event_price'];
+					}
+?>
+
+<?php
+	//軽減税率表示対応 START
+	$tax_disp = '';
+	if ($reduced_tax_disp_flg) {
+		//表示内容をセットする
+		if ($id_val['tax_rate'] == 0) {
+			$tax_disp = $reduced_none_tax_disp;
+		} else {
+			$tax_disp = $this->getSetting('reduced_tax_disp',array($id_val['tax_rate']));
+		}
+	}
+//軽減税率表示対応 END ?>
+
+<?php if ($this->price_display_type == '0') {
+	// 商品マスタ表示価格タイプ 0:税込価格	?>
+					<p class="itemPrice">
+					<span class="itemPrice"><?php echo number_format($this->escape($intax_price),$this->number_of_digits); ?></span>円
+	<?php if ($reduced_tax_disp_flg) {
+		echo '&nbsp;<span class="small">'.$this->escape($tax_disp).'</span>';
+	} ?>
+					</p>
+<?php } else if ($this->price_display_type == '1') {
+	// 商品マスタ表示価格タイプ 1:本体価格表示のみ	?>
+					<p class="itemPrice">
+					本体&nbsp;<span class="itemPrice"><?php echo number_format($this->escape($base_price)); ?></span>円&nbsp;
+	<?php if ($reduced_tax_disp_flg) {
+		echo '&nbsp;<span class="small">'.$this->escape($tax_disp).'</span>';
+	} ?>
+					</p>
+<?php } else {
+	// 商品マスタ表示価格タイプ 9:両方の価格表示	?>
+					<p class="itemPrice">
+					本体&nbsp;<span class="itemPrice"><?php echo number_format($this->escape($base_price)); ?></span>円&nbsp;
+					<span class="small">税込</span>&nbsp;<span class="itemPrice-small"><?php echo number_format($this->escape($intax_price),$this->number_of_digits); ?></span><span class="small">円</span>
+	<?php if ($reduced_tax_disp_flg) {
+		echo '&nbsp;<span class="small">'.$this->escape($tax_disp).'</span>';
+	} ?>
+					</p>
+<?php } ?>
+				</div>
+			</a>
+		</div>
+	<!--//itemListBox--></div>
+<?php
+	$p_exec_count++;
+}
+?>
+	<!--//updates--></div>
+<!--//timeline--></div>
+<?php if ($this->exists_next) { ?>
+<div id="more_area" class="morebox">
+<a href="#" class="more_cmpn" id="<?php echo $this->escape($this->next_page_no); ?>" url="<?php echo $this->escape($this->url); ?>" loading="<?php echo $this->escape($this->loading_gif); ?>">次の<?php echo $this->escape($this->next_count); ?>件を見る</a>
+</div>
+<?php } ?>
+
+<div class="toolBox">
+	<div class="toolBoxBody">
+		<ul class="naviList"><li class="viewNum">全<strong><?php echo $this->escape($this->item_data[1]); ?></strong> 件</li></ul>
+		<ul class="submitList">
+			<li><a href="#" title="並び替え" class="popup button buttonCheck">並び替え</a></li>
+		</ul>
+	</div>
+</div>
+
+<div style='display:none'>
+	<nav id="itemSortBox">
+		<h2 class="title">商品並び替え</h2>
+		<ul class="itemSortList">
+<?php
+$_disp_order_count = count($this->disp_order);
+for ($i=1; $i<=$_disp_order_count; $i++) {
+	if (!isset($this->list_data['order']) || $this->list_data['order'] == $i) {
+		echo '			<li><span class="mark markActive">'.$this->escape($this->disp_order[$i]).'</span></li>'."\n";
+	} else {
+		echo '			<li><a href="?order='.$i.'&amp;start=0&amp;evid='.$this->escape($this->campaign_event_data['event_id']).'" class="button button3">'.$this->escape($this->disp_order[$i]).'</a></li>'."\n";
+	}
+}
+?>
+		</ul>
+	</nav>
+</div>
+<?php
+	}
+}
+?>
+<div class="Box" id="searchItem">
+	<div class="searchItemBox">
+		<form id="searchItemForm" action="<?php echo $this->escape($this->top_page); ?>shop/<?php echo $this->escape($this->shop_code); ?>/cmpn_item_lst.php" method="post">
+		<input type="hidden" name="evid" value="<?php echo $this->escape($this->campaign_event_data['event_id']); ?>" />
+		<div class="searchItemFormBox">
+			<div class="label"><p>商品検索</p></div>
+			<div class="form">
+				<div class="textBox"><input type="text" value="" name="p_dtl_srh_wd" class="itemName" results="10" placeholder="商品名を入力" /></div>
+				<div class="submitBox"><input class="button button1" type="submit" value="検索" name="p_dtl_srh_btn" /></div>
+			</div>
+		</div>
+		</form>
+	</div>
+<!--//Box--></div>
+
+<?php echo $this->render('_parts/modules/aboutPoint.html'); /* ポイントについて */ ?>
+<?php echo $this->render('_parts/modules/aboutShopDataBox.html'); /* 担当店舗について */ ?>
+<?php echo $this->render('_parts/modules/aboutManifest.html'); /* 医薬品販売適合証 */ ?>
+
+		</article>
+<?php echo $this->render('_parts/footer/footer.html'); /* フッター */ ?>
+	<!--//wrap--></div>
+<?php echo $this->render('_parts/footer/analytics.html'); /* Google Analytics */ ?>
+</body>
+</html>
