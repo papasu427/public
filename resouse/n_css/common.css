@@ -696,15 +696,7 @@ nav li.has-child ul li a:active {
   min-width: auto;
 }
 
-.st-header-large {
-  min-width: 1280px;
-}
-
-.st-header-wrap-tkb-logo {
-  width: 360px;
-}
-
-.st-menu {
+.side-menu {
   position: fixed;
   left: 0;
   top: 0;
@@ -714,57 +706,42 @@ nav li.has-child ul li a:active {
   display: none;
 }
 
-.st-menu-bg {
+.side-menu-bg {
   width: 100%;
   height: 100vh;
   cursor: pointer;
   background-color: rgba(0, 0, 0, 0.7);
 }
 
-.st-menu-main {
-  width: 360px;
+.side-menu-main {
+  width: 390px;
   height: 100vh;
-  padding: 30px;
   background-color: #ffffff;
   position: absolute;
   top: 0;
   right: 0;
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
 }
 
-.st-menu-main-welcome {
-  font-size: 1.8rem;
-  margin-bottom: 14px;
+.side-menu-profile {
+  background: #ededed;
+  padding: 20px;
+  border-radius: 8px;
 }
 
-.st-menu-main-name {
-  font-size: 1.8rem;
-  font-weight: bold;
-  margin-bottom: 18px;
-}
-
-.st-menu-main-point {
-  font-size: 1.4rem;
-  font-weight: bold;
-  margin-bottom: 23px;
-}
-
-.st-menu-main-close {
-  position: absolute;
-  top: 20px;
-  right: 25px;
-  cursor: pointer;
-}
-
-.st-menu-main ul {
+.side-menu-main ul {
   border-top: solid 1px #dddddd;
-  width: 300px;
+  width: 330px;
   list-style: none;
+  overflow-y: scroll;
+  flex-grow: 1;
 }
 
-.st-menu-main ul li {
+.side-menu-main ul li {
   height: 55px;
   line-height: 55px;
-  font-weight: bold;
   border-bottom: dotted 1px #dddddd;
 }
 
@@ -819,7 +796,7 @@ nav li.has-child ul li a:active {
   display: none;
 }
 
-.batsu {
+.side-menu-close {
   display: block;
   width: 30px;
   height: 30px;
@@ -828,8 +805,8 @@ nav li.has-child ul li a:active {
   top: 30px;
 }
 
-.batsu::before,
-.batsu::after {
+.side-menu-close::before,
+.side-menu-close::after {
   content: "";
   display: block;
   width: 100%;
@@ -842,7 +819,7 @@ nav li.has-child ul li a:active {
   left: 16%;
 }
 
-.batsu::after {
+.side-menu-close::after {
   transform: rotate(-45deg);
   transform-origin: 100% 50%;
   left: auto;

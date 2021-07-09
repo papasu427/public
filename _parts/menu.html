@@ -3,28 +3,59 @@
     <label for="menu-btn-check" class="menu-btn"><span></span></label>
     <!--ここからメニュー-->
     <div class="menu-content">
-        <div class="st-menu" style="display: block;">
-            <label for="menu-btn-check"><div class="st-menu-bg"></div></label>
-            <div class="st-menu-main" style="transform: translateX(0px);">
-                <p class="st-menu-main-welcome">ようこそ</p>
-                <label for="menu-btn-check" style="right:10px;" class="batsu"><span></span></label>
-                <p class="st-menu-main-name">
-                    辻本大貴さん
-                </p>
-                <p class="st-menu-main-point">
-                    <a href="https://nanaco.omni7.jp/fair/nanacotop" target="_blank">nanacoポイント：13ポイント</a>
-                </p>
-                <p class="st-menu-main-point">
-                    <a href="/nspc/movecrmmemberportal.do" target="_blank">マイル：13マイル</a>
-                </p>
-                <ul class="st-menu-main-ul">
-                    <li class="first list_even"><a href="/nspc/ordersituation.do">ご注文履歴</a></li>
+        <div class="side-menu" style="display: block;">
+            <label for="menu-btn-check"><div class="side-menu-bg"></div></label>
+            <div class="side-menu-main" style="transform: translateX(0px);">
+                <label for="menu-btn-check" style="right:10px;" class="side-menu-close"><span></span></label>
+                <div class="side-menu-profile">
+                    <div class="flex justify-between items-center mb-16px pb-16px border-b-1 bd-gray-5">
+                        <p class="text-size18 font-bold">
+                            見本花子様
+                        </p>
+                        <a class="relative pr-1">
+                            <span class="absolute notice" style="left: 44px; top: -10px;">100</span><img src="resouse/s_images/common/menu_cart_btn.png" width="60px" height="auto">
+                        </a>
+                    </div>
+                    
+                    <p class="font-bold mb-12px">
+                        保有ポイント：13ポイント
+                    </p>
+                    <p class="font-bold">
+                        現在のカート内小計：130円
+                    </p>
+                </div>
 
-                    <li class="list_odd"><a href="/nspc/registinfoconf.do">会員登録情報</a></li>
-                    <li class="list_even"><a href="/nspc/memberservice.do">会員サービス</a></li>
-                    <li class="list_odd"><a href="/nspc/info/help.do">ヘルプ・お問い合わせ</a></li>
-                    <li class="last list_even"><a href="/nspc/logout.do?sp=ns">ログアウト</a></li>
+                <a href="#" class="btn-small-outline mb-32px mt-32px">
+                    topに戻る
+                </a>
+                <ul class="side-menu-main-ul">
+                    <li class="font-bold"><a href="#" class="flex items-center"><img class="w-22px h-16px" src="resouse/s_images/common/mail.png" ><span class="ml-3">お知らせ</span></a></li>
+                    <li class="font-bold"><a href="#" class="flex items-center"><img class="w-20px h-20px" src="resouse/s_images/common/menu-account.png"><span class="ml-3">マイページ</span></a></li>
+                    <li><a href="#">注文ステータス</a></li>
+                    <li><a href="#">配送先</a></li>
+                    <li><a href="#">購入履歴</a></li>
+                    <li><a href="#">ランク/ポイント</a></li>
+                    <li><a href="#">クーポン一覧</a></li>
+                    <li><a href="#">各種お手続き(メール設定/退会)</a></li>
+                    <li><a href="#">お問い合わせ</a></li>
+                    <li class="font-bold"><a href="#" class="flex items-center">
+                        <img class="w-20px h-20px" src="resouse/s_images/common/haert.png"><span class="ml-3">お気に入り</span></a>
+                    </li>
+                    <li class="font-bold"><a href="#" class="flex items-center">
+                            <img class="w-20px h-20px" src="resouse/s_images/common/menu-service.png"><span class="ml-3">サービス概要</span></a>
+                    </li>
+                    <li class="font-bold"><a href="#" class="flex items-center">
+                            <img class="w-8per h-8per" src="resouse/s_images/common/menu-question.png"><span class="ml-3">よくあるご質問</span></a>
+                    </li>
+                    <li><a href="#">特定商取引法に基づく表示</a></li>
+                    <li><a href="#">医療品販売に関するご案内</a></li>
+                    <li><a href="#">プライバシーポリシー</a></li>
+                    <li><a href="#">会社規約</a></li>
+                    <li><a href="#">会社概要</a></li>
                 </ul>
+                <a href="#" class="btn-small-outline mt-32px">
+                    ログアウト
+                </a>
             </div>
         </div>
     </div>
