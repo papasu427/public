@@ -1,0 +1,34 @@
+<div class="bg-category sideBoxBody-category">
+    <div class="overflow-x-scroll overflow-x-hidden whitespace-no-wrap content-width center-margin h-48px">
+        <ul class="menuList bd-b-color-gray itemList flex justify-state items-center h-full text-size16 relative">
+            <?php
+					if (isset($_GET['product'])) {
+						$product = $_GET['product'];
+					} else {
+						$product = 0;
+					};
+					for ($val = 0; $val <= 20; $val++) {
+						if ($val == $product) {
+							echo '<li class="flex items-center h-full relative"><div class="menuList';
+							echo $val;
+							echo ' px-12px font-bold">
+							<a href="#" class="menu">お気に入り</a>
+						</div>
+						<div class="basic-border bd-b-category absolute w-full inset-x-0 bottom-0"></div>
+						</li>';
+						} else {
+							echo '<li><div class="menuList';
+							echo $val;
+							echo ' px-12px">
+							<a href="?product=';
+							echo $val;
+							echo '" class="menu">お気に入り</a>
+						</div>
+						</li>';
+						};
+					}
+
+					?>
+        </ul>
+    </div>
+</div>

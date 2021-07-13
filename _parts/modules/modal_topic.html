@@ -1,0 +1,15 @@
+<div id="modal01" class="js-modal modal">
+    <div class="modal__bg modal-close"></div>
+    <div class="modal__content modal__content_tokusyu relative">
+        <div class="modal__tokusyu_title">全ての特集</div>
+        <a href="" class="modal-close text-size32" style="position: absolute;top: 0px;right: 12px;">×</a>
+        <ul class="flex-list-2col_modal_tokusyu px-32px my-32px overflow-scroll">
+            <?php
+				for ($val = 0; $val <= 20; $val++) {
+					echo '<li><a href="#" class="btn-large-outline box-read ">オススメ特集</a></li>';
+				}
+				?>
+        </ul>
+    </div>
+    <!--modal__inner-->
+</div>
